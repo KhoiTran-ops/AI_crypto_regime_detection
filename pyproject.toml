@@ -11,6 +11,7 @@ dependencies = ["numpy", "pandas", "scipy", "scikit-learn", "hmmlearn", "statsmo
 
 [project.optional-dependencies]
 dev = ["pytest", "ruff", "playwright"]
+paper = ["reportlab==4.4.9"]
 
 [project.scripts]
 crypto-regime = "regime.cli:main"
