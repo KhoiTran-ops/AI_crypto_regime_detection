@@ -1,0 +1,26 @@
+[
+  {
+    "asset": "BTCUSDT",
+    "expected_days": 3332,
+    "valid_days": 3332,
+    "coverage": 1.0,
+    "duplicate_rows": 0,
+    "first": "2017-08-17 00:00:00+00:00",
+    "last": "2026-09-30 00:00:00+00:00",
+    "missing_dates": [],
+    "partial_first_day": "2017-08-17; first minute 04:00 UTC",
+    "nonpositive_volume_days": 0
+  },
+  {
+    "asset": "ETHUSDT",
+    "expected_days": 3332,
+    "valid_days": 3332,
+    "coverage": 1.0,
+    "duplicate_rows": 0,
+    "first": "2017-08-17 00:00:00+00:00",
+    "last": "2026-09-30 00:00:00+00:00",
+    "missing_dates": [],
+    "partial_first_day": "2017-08-17; first minute 04:00 UTC",
+    "nonpositive_volume_days": 0
+  }
+]

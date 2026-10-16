@@ -1,0 +1,37 @@
+{
+  "purpose": "Synthetic TVTP sanity check only; not empirical market evidence",
+  "n_generated": 1600,
+  "n_train": 1585,
+  "n_evaluation": 15,
+  "true_logit_p_low_given_low": {
+    "intercept": 2,
+    "slope": -0.8
+  },
+  "true_logit_p_low_given_high": {
+    "intercept": -1,
+    "slope": -0.7
+  },
+  "raw_high_vol_state": 1,
+  "estimated_slopes": [
+    {
+      "period": "2023-05-05 00:00:00+00:00",
+      "parameter": "p[0->0].tvtp1",
+      "estimate": -0.6585462521990831,
+      "std_error": 0.15776894297740954,
+      "ci_low": -0.9677733804348059,
+      "ci_high": -0.34931912396336046
+    },
+    {
+      "period": "2023-05-05 00:00:00+00:00",
+      "parameter": "p[1->0].tvtp1",
+      "estimate": -0.5937959797360819,
+      "std_error": 0.17653121574767103,
+      "ci_low": -0.9397971626015171,
+      "ci_high": -0.2477947968706467
+    }
+  ],
+  "transition_driver_directions_recovered": true,
+  "probability_rows_sum_to_one": true,
+  "optimizer_converged": true,
+  "passed": true
+}

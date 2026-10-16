@@ -90,7 +90,7 @@ def reproduce():
         final.FINAL = original
     report = {"status": "passed", "raw_archives_checksum_verified": checked,
         "spot_rebuilt_from_raw": True, "funding_and_oi_rebuilt_from_raw": True, "all_18_models_refitted_without_prediction_cache": True,
-        "all_summary_tables_equal": True, "rtol": 1e-8, "atol": 1e-10,
+        "evaluation_summary_tables_equal": True, "summary_tables_compared": names, "rtol": 1e-8, "atol": 1e-10,
         "maximum_absolute_prediction_difference": maximum,
         "environment": "Same pinned environment; raw cache retained; separate temporary result directory",
         "not_claimed": "Second cold installation, historical data vintages or a second independent data provider"}

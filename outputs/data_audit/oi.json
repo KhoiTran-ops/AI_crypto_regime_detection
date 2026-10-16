@@ -1,0 +1,22 @@
+[
+  {
+    "asset": "BTCUSDT",
+    "expected_days": 1765,
+    "valid_days": 1763,
+    "coverage": 0.9988668555240793,
+    "failures": [],
+    "duplicate_snapshots": 0,
+    "invalid_snapshots": 475,
+    "rule": "Last snapshot before midnight; age <=15 minutes; duplicates verified identical."
+  },
+  {
+    "asset": "ETHUSDT",
+    "expected_days": 1765,
+    "valid_days": 1763,
+    "coverage": 0.9988668555240793,
+    "failures": [],
+    "duplicate_snapshots": 0,
+    "invalid_snapshots": 218,
+    "rule": "Last snapshot before midnight; age <=15 minutes; duplicates verified identical."
+  }
+]

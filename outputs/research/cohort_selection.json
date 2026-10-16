@@ -1,0 +1,25 @@
+{
+  "choices": {
+    "BTCUSDT": {
+      "B": 3,
+      "C": 3
+    },
+    "ETHUSDT": {
+      "B": 3,
+      "C": 3
+    }
+  },
+  "input_fingerprint": {
+    "config.json": "ab1b99bcde79e895b112652093f0cb5f720c978a9239608962dbe6216bef0b0e",
+    "data/processed/BTCUSDT_funding.parquet": "c161c6ed172c42e8fb8b2aa6426a476b8bb12e4afa54cee8da9c4f17925e2f61",
+    "data/processed/BTCUSDT_oi.parquet": "b5c4f85520b3a597e92be203207ef795ba51dc1a112e9bf80e0750c386e9e8bd",
+    "data/processed/BTCUSDT_spot.parquet": "389e58df7864d3da5c20600ec0667aeb23d16f6a655bfbd648ce50d2a10ea8a6",
+    "data/processed/ETHUSDT_funding.parquet": "b647f0e6e88dc84505aa2dd72314166ee7b3b2a209deabf6842791d3bf909e14",
+    "data/processed/ETHUSDT_oi.parquet": "65f36171cedcfdf6793f8a2beedf3644fad65e439ec8ba5520365a7fb801240a",
+    "data/processed/ETHUSDT_spot.parquet": "cae4e0da3e0fc7340166f3ab59d350d9fb9ed0649f891e84d08c343ff701e499"
+  },
+  "final_test_opened": false,
+  "status": "Exploratory extensions; no transition-parameter recovery claim",
+  "line_endings_rebased_without_numeric_change": true,
+  "checkpoint_scope": "Selection-time checkpoint; current test access/corrections are recorded in results/revision.json"
+}

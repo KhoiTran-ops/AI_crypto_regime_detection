@@ -1,0 +1,66 @@
+{
+  "page_count": 13,
+  "all_pages_rendered": true,
+  "pages": [
+    {
+      "page": 1,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 2,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 3,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 4,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 5,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 6,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 7,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 8,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 9,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 10,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 11,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 12,
+      "out_of_margin_characters": 0
+    },
+    {
+      "page": 13,
+      "out_of_margin_characters": 0
+    }
+  ],
+  "pixel_changed_pages": [
+    10
+  ],
+  "font": "Embedded Arial with Vietnamese glyphs",
+  "renderer": "ReportLab 4.4.9 + Poppler",
+  "visual_review": "Completed: all 13 pages inspected; 12 final pages pixel-identical, final changed page 10 visually rechecked.",
+  "out_of_margin_characters": 0,
+  "visual_review_completed": true
+}

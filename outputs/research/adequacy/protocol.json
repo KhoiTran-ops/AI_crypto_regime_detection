@@ -1,0 +1,10 @@
+{
+  "gaussian_replicates": 100,
+  "estimator": "same 20-start estimator as initial training",
+  "transition_rmse_max": 0.05,
+  "volatility_relative_rmse_max": 0.2,
+  "convergence_rate_min": 0.9,
+  "selection_rule": "Highest validation score among candidates passing recovery at actual n",
+  "final_test_used": false,
+  "simulation_limit": "Conditional on fitted Gaussian DGP, not proof of true regimes"
+}

@@ -9,3 +9,15 @@ data/processed/
 outputs/runs/
 .env
 *.log
+
+outputs/pilot_absolute_volume/
+outputs/research/*
+!outputs/research/selection.json
+!outputs/research/benchmark_selection.json
+!outputs/research/cohort_selection.json
+!outputs/research/adequacy/
+outputs/research/adequacy/*
+!outputs/research/adequacy/protocol.json
+!outputs/research/adequacy/decisions.json
+
+outputs/prior_runs/

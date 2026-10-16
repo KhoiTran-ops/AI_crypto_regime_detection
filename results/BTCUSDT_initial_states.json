@@ -1,0 +1,229 @@
+{
+  "states": [
+    {
+      "state": 0,
+      "posterior_days": 565.6929314586189,
+      "occupancy": 0.2148472964142115,
+      "argmax_episodes": 26,
+      "mean_return_daily": 0.0024216887613234444,
+      "volatility_annual": 0.37547701296663816,
+      "persistence": 0.9665301025313137,
+      "expected_duration_days": 29.87759376722253,
+      "limited_evidence": false
+    },
+    {
+      "state": 1,
+      "posterior_days": 758.7841015207175,
+      "occupancy": 0.28818234011421096,
+      "argmax_episodes": 44,
+      "mean_return_daily": -9.174047085297687e-05,
+      "volatility_annual": 0.5147385286929503,
+      "persistence": 0.9547923122420237,
+      "expected_duration_days": 22.120131543855884,
+      "limited_evidence": false
+    },
+    {
+      "state": 2,
+      "posterior_days": 834.37642589546,
+      "occupancy": 0.316891920203365,
+      "argmax_episodes": 33,
+      "mean_return_daily": 0.0021054656452725224,
+      "volatility_annual": 0.6743461042482672,
+      "persistence": 0.9653333588053236,
+      "expected_duration_days": 28.84617504142756,
+      "limited_evidence": false
+    },
+    {
+      "state": 3,
+      "posterior_days": 474.1465411252036,
+      "occupancy": 0.18007844326821254,
+      "argmax_episodes": 20,
+      "mean_return_daily": -0.0005678390263250849,
+      "volatility_annual": 1.1929082216375715,
+      "persistence": 0.9739382739562685,
+      "expected_duration_days": 38.37044401134461,
+      "limited_evidence": false
+    }
+  ],
+  "metadata": {
+    "k": 4,
+    "seed": 95,
+    "n_train": 2633,
+    "train_end": "2024-12-31 00:00:00+00:00",
+    "n_parameters": 39,
+    "train_ll": -7719.577334528823,
+    "aic": 15517.154669057645,
+    "bic": 15746.313956278002,
+    "converged_starts": 20,
+    "trials": [
+      {
+        "seed": 11,
+        "train_ll": -7830.004859172372,
+        "iterations": 45,
+        "converged": true,
+        "last_delta": 0.008584558077927795
+      },
+      {
+        "seed": 23,
+        "train_ll": -7719.577963361835,
+        "iterations": 37,
+        "converged": true,
+        "last_delta": 0.006098717723034497
+      },
+      {
+        "seed": 35,
+        "train_ll": -7728.834554693333,
+        "iterations": 55,
+        "converged": true,
+        "last_delta": 0.00753105371404672
+      },
+      {
+        "seed": 47,
+        "train_ll": -7719.57764261709,
+        "iterations": 62,
+        "converged": true,
+        "last_delta": 0.005157357634743676
+      },
+      {
+        "seed": 59,
+        "train_ll": -7830.00593639045,
+        "iterations": 44,
+        "converged": true,
+        "last_delta": 0.009653708986661513
+      },
+      {
+        "seed": 71,
+        "train_ll": -7830.005747408576,
+        "iterations": 53,
+        "converged": true,
+        "last_delta": 0.009464198342357122
+      },
+      {
+        "seed": 83,
+        "train_ll": -7719.577738884409,
+        "iterations": 64,
+        "converged": true,
+        "last_delta": 0.005449074975331314
+      },
+      {
+        "seed": 95,
+        "train_ll": -7719.577334528823,
+        "iterations": 65,
+        "converged": true,
+        "last_delta": 0.00466496982062381
+      },
+      {
+        "seed": 107,
+        "train_ll": -7719.578638185496,
+        "iterations": 60,
+        "converged": true,
+        "last_delta": 0.007885971145697113
+      },
+      {
+        "seed": 119,
+        "train_ll": -8177.87997517052,
+        "iterations": 73,
+        "converged": true,
+        "last_delta": 0.009451890932723472
+      },
+      {
+        "seed": 131,
+        "train_ll": -7719.578737940626,
+        "iterations": 41,
+        "converged": true,
+        "last_delta": 0.008177083319424128
+      },
+      {
+        "seed": 143,
+        "train_ll": -7719.577583248061,
+        "iterations": 52,
+        "converged": true,
+        "last_delta": 0.005075742084954982
+      },
+      {
+        "seed": 155,
+        "train_ll": -7719.578446896551,
+        "iterations": 60,
+        "converged": true,
+        "last_delta": 0.007359515457210364
+      },
+      {
+        "seed": 167,
+        "train_ll": -7830.003402742306,
+        "iterations": 55,
+        "converged": true,
+        "last_delta": 0.007216802388938959
+      },
+      {
+        "seed": 179,
+        "train_ll": -7830.164807187794,
+        "iterations": 30,
+        "converged": true,
+        "last_delta": 0.009327259658675757
+      },
+      {
+        "seed": 191,
+        "train_ll": -7728.836444138263,
+        "iterations": 69,
+        "converged": true,
+        "last_delta": 0.009149774686193268
+      },
+      {
+        "seed": 203,
+        "train_ll": -7830.163160874954,
+        "iterations": 43,
+        "converged": true,
+        "last_delta": 0.007717287249761284
+      },
+      {
+        "seed": 215,
+        "train_ll": -8177.872298090697,
+        "iterations": 55,
+        "converged": true,
+        "last_delta": 0.00887099261763069
+      },
+      {
+        "seed": 227,
+        "train_ll": -7728.837121347385,
+        "iterations": 72,
+        "converged": true,
+        "last_delta": 0.009761435319887823
+      },
+      {
+        "seed": 239,
+        "train_ll": -7719.577918006076,
+        "iterations": 55,
+        "converged": true,
+        "last_delta": 0.009434578652872005
+      }
+    ]
+  },
+  "transition": [
+    [
+      0.9665301025313137,
+      0.026969621411456868,
+      2.3186153129135294e-08,
+      0.006500252871076271
+    ],
+    [
+      0.024247558575266948,
+      0.9547923122420237,
+      0.020960129182709297,
+      2.9936997549802865e-21
+    ],
+    [
+      0.001475682601282581,
+      0.023453040642736536,
+      0.9653333588053236,
+      0.009737917950657473
+    ],
+    [
+      2.304332986299215e-154,
+      8.104137365882413e-102,
+      0.02606172604373152,
+      0.9739382739562685
+    ]
+  ],
+  "stress_state": 3,
+  "meaning": "Model fit through 2024-12-31; profiles are descriptive, not known true labels"
+}

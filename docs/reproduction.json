@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "raw_archives_checksum_verified": 3752,
+  "spot_rebuilt_from_raw": true,
+  "funding_and_oi_rebuilt_from_raw": true,
+  "all_18_models_refitted_without_prediction_cache": true,
+  "rtol": 1e-08,
+  "atol": 1e-10,
+  "maximum_absolute_prediction_difference": 0.0,
+  "environment": "Same pinned environment; raw cache retained; separate temporary result directory",
+  "not_claimed": "Second cold installation, historical data vintages or a second independent data provider",
+  "evaluation_summary_tables_equal": true,
+  "summary_tables_compared": [
+    "model_scores.csv",
+    "portfolio_performance.csv",
+    "score_comparisons.csv",
+    "portfolio_uncertainty.csv",
+    "method_comparison.csv"
+  ]
+}

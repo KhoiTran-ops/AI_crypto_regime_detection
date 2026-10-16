@@ -1,0 +1,217 @@
+{
+  "choices": {
+    "BTCUSDT": {
+      "k": 4,
+      "selection_criterion": "mean monthly walk-forward validation log density",
+      "limited_states": 0,
+      "adequacy": {
+        "k": 4,
+        "recovery_passed": true,
+        "best_density_k": 5,
+        "state_diagnostics": [
+          {
+            "state": 0,
+            "posterior_days": 201.8422221747158,
+            "occupancy": 0.10612104215284743,
+            "argmax_episodes": 12,
+            "mean_return_daily": 0.0028831373550038683,
+            "volatility_annual": 0.3535780867202145,
+            "persistence": 0.9523846280176154,
+            "expected_duration_days": 21.001621080896967,
+            "limited_evidence": false
+          },
+          {
+            "state": 1,
+            "posterior_days": 633.5293806932741,
+            "occupancy": 0.33308589941812516,
+            "argmax_episodes": 27,
+            "mean_return_daily": -0.0005667238536042472,
+            "volatility_annual": 0.5308580634621953,
+            "persistence": 0.9624655125415261,
+            "expected_duration_days": 26.64216478528835,
+            "limited_evidence": false
+          },
+          {
+            "state": 2,
+            "posterior_days": 621.0431246201881,
+            "occupancy": 0.32652109601482027,
+            "argmax_episodes": 26,
+            "mean_return_daily": 0.0020683890227415256,
+            "volatility_annual": 0.6981535868362483,
+            "persistence": 0.9614803170408824,
+            "expected_duration_days": 25.960753650577523,
+            "limited_evidence": false
+          },
+          {
+            "state": 3,
+            "posterior_days": 445.58527251182204,
+            "occupancy": 0.23427196241420717,
+            "argmax_episodes": 19,
+            "mean_return_daily": -0.0010154635109626603,
+            "volatility_annual": 1.2146167969040225,
+            "persistence": 0.9754826563417496,
+            "expected_duration_days": 40.787452912480845,
+            "limited_evidence": false
+          }
+        ]
+      }
+    },
+    "ETHUSDT": {
+      "k": 5,
+      "selection_criterion": "mean monthly walk-forward validation log density",
+      "limited_states": 0,
+      "adequacy": {
+        "k": 5,
+        "recovery_passed": true,
+        "best_density_k": 5,
+        "state_diagnostics": [
+          {
+            "state": 0,
+            "posterior_days": 390.31887171096014,
+            "occupancy": 0.2052149693538171,
+            "argmax_episodes": 19,
+            "mean_return_daily": 0.0006260426487884441,
+            "volatility_annual": 0.6212092440715623,
+            "persistence": 0.9577976569006155,
+            "expected_duration_days": 23.695366810441,
+            "limited_evidence": false
+          },
+          {
+            "state": 1,
+            "posterior_days": 419.91134262483274,
+            "occupancy": 0.22077357656405508,
+            "argmax_episodes": 33,
+            "mean_return_daily": -0.002737672846245832,
+            "volatility_annual": 0.8322873993352319,
+            "persistence": 0.9239355621731221,
+            "expected_duration_days": 13.146748054274624,
+            "limited_evidence": false
+          },
+          {
+            "state": 2,
+            "posterior_days": 436.5017900762416,
+            "occupancy": 0.22949620929350242,
+            "argmax_episodes": 38,
+            "mean_return_daily": 0.003714895150057358,
+            "volatility_annual": 0.9037371213420722,
+            "persistence": 0.9147817502656451,
+            "expected_duration_days": 11.73457567031983,
+            "limited_evidence": false
+          },
+          {
+            "state": 3,
+            "posterior_days": 426.0345366863951,
+            "occupancy": 0.2239929214965274,
+            "argmax_episodes": 24,
+            "mean_return_daily": 0.001083408338097765,
+            "volatility_annual": 1.117206640564813,
+            "persistence": 0.944971745479867,
+            "expected_duration_days": 18.172482640424885,
+            "limited_evidence": false
+          },
+          {
+            "state": 4,
+            "posterior_days": 229.23345890157037,
+            "occupancy": 0.12052232329209799,
+            "argmax_episodes": 6,
+            "mean_return_daily": 0.0004111308941870526,
+            "volatility_annual": 1.5844091901600377,
+            "persistence": 0.973746318117369,
+            "expected_duration_days": 38.08989552286697,
+            "limited_evidence": false
+          }
+        ]
+      }
+    }
+  },
+  "config": {
+    "assets": [
+      "BTCUSDT",
+      "ETHUSDT"
+    ],
+    "raw_start": "2017-08-17",
+    "end": "2026-09-30",
+    "analysis_start": "2017-10-17",
+    "train_end": "2022-12-31",
+    "validation_start": "2023-01-01",
+    "validation_end": "2024-12-31",
+    "test_start": "2025-01-01",
+    "test_end": "2026-09-30",
+    "k": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "seeds": [
+      11,
+      23,
+      35,
+      47,
+      59,
+      71,
+      83,
+      95,
+      107,
+      119,
+      131,
+      143,
+      155,
+      167,
+      179,
+      191,
+      203,
+      215,
+      227,
+      239
+    ],
+    "max_iter": 300,
+    "covariance": "diag",
+    "refit": "monthly",
+    "cost_bps": [
+      5,
+      10,
+      25
+    ],
+    "annualization": 365,
+    "execution_delay_days": 2,
+    "volatility_target": 0.4,
+    "split_status": "candidate_requires_adequacy_report",
+    "bootstrap_samples": 500,
+    "refit_seeds": [
+      11,
+      23,
+      37
+    ],
+    "core_features": [
+      "return",
+      "rv30",
+      "volume_z"
+    ],
+    "feature_revision": "Train-only pilot rejected absolute volume: near-absorbing exchange-growth states. Relative volume uses prior 30 days only."
+  },
+  "input_fingerprint": {
+    "config.json": "ab1b99bcde79e895b112652093f0cb5f720c978a9239608962dbe6216bef0b0e",
+    "data/processed/BTCUSDT_funding.parquet": "c161c6ed172c42e8fb8b2aa6426a476b8bb12e4afa54cee8da9c4f17925e2f61",
+    "data/processed/BTCUSDT_oi.parquet": "b5c4f85520b3a597e92be203207ef795ba51dc1a112e9bf80e0750c386e9e8bd",
+    "data/processed/BTCUSDT_spot.parquet": "389e58df7864d3da5c20600ec0667aeb23d16f6a655bfbd648ce50d2a10ea8a6",
+    "data/processed/ETHUSDT_funding.parquet": "b647f0e6e88dc84505aa2dd72314166ee7b3b2a209deabf6842791d3bf909e14",
+    "data/processed/ETHUSDT_oi.parquet": "65f36171cedcfdf6793f8a2beedf3644fad65e439ec8ba5520365a7fb801240a",
+    "data/processed/ETHUSDT_spot.parquet": "cae4e0da3e0fc7340166f3ab59d350d9fb9ed0649f891e84d08c343ff701e499"
+  },
+  "selected_at_utc": "2026-10-16T13:48:19.298026+00:00",
+  "final_test_opened": false,
+  "adequacy_protocol": {
+    "gaussian_replicates": 100,
+    "estimator": "same 20-start estimator as initial training",
+    "transition_rmse_max": 0.05,
+    "volatility_relative_rmse_max": 0.2,
+    "convergence_rate_min": 0.9,
+    "selection_rule": "Highest validation score among candidates passing recovery at actual n",
+    "final_test_used": false,
+    "simulation_limit": "Conditional on fitted Gaussian DGP, not proof of true regimes"
+  },
+  "sample_status": "A_recovery_checked; B_C_require_cohort_diagnostics",
+  "line_endings_rebased_without_numeric_change": true,
+  "checkpoint_scope": "Selection-time checkpoint; current test access/corrections are recorded in results/revision.json"
+}

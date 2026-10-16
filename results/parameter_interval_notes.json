@@ -1,0 +1,6 @@
+{
+  "replicates": 100,
+  "initializations_each": 20,
+  "test_data_used": false,
+  "limitation": "Conditional Gaussian model and state matching; 100 replicates give coarse tail quantiles. Not a guarantee of coverage under misspecification."
+}
