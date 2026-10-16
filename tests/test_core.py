@@ -112,3 +112,14 @@ def test_return_density_does_not_condition_on_todays_other_features():
     b, _ = fitted.filter(changed)
     assert a.return_log_score.iloc[0] == b.return_log_score.iloc[0]
     assert a.p_high_vol.iloc[0] != b.p_high_vol.iloc[0]
+
+
+def test_markov_search_is_reproducible_with_generator_seed():
+    from regime.benchmarks import markov_walk
+    index = pd.date_range("2020-01-01", "2021-01-31", tz="UTC")
+    rng = np.random.default_rng(2026)
+    sd = np.where((np.arange(len(index)) // 60) % 2, .04, .01)
+    frame = pd.DataFrame({"return": rng.normal(0, sd)}, index=index)
+    a, _, _ = markov_walk(frame, "MS0", 2, "2021-01-01", "2021-01-31")
+    b, _, _ = markov_walk(frame, "MS0", 2, "2021-01-01", "2021-01-31")
+    pd.testing.assert_frame_equal(a, b, check_exact=True)

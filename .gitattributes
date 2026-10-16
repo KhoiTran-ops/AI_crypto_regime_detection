@@ -1,0 +1,13 @@
+* text=auto
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.parquet binary
+*.png binary
+*.pdf binary
+requirements.lock -text
+*.csv -text
+results/** -text
+paper/** -text
+docs/history/** -text

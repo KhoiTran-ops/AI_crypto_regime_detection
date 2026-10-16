@@ -71,9 +71,8 @@ def markov_walk(frame, kind, k, start, end, covariates=None):
                 return MarkovAutoregression(data, k_regimes=k, order=1, trend="c", switching_variance=True)
             return MarkovRegression(data, k_regimes=k, trend="c", switching_variance=True, exog_tvtp=exog)
         model = construct(train["return"].to_numpy() * 100, exog_train)
-        np.random.seed(11)
         with warnings.catch_warnings(record=True) as captured, threadpool_limits(limits=1):
-            fitted = model.fit(search_reps=5, maxiter=300, disp=False)
+            fitted = model.fit(search_reps=5, maxiter=300, disp=False, rng=11)
             if not fitted.mle_retvals.get("converged", False):
                 fitted = model.fit(start_params=fitted.params, method="bfgs", maxiter=700,
                                    em_iter=0, disp=False)
