@@ -1,4 +1,5 @@
 """Funding events and OI archives, retained separately from the spot dataset."""
+import hashlib
 import json
 from urllib.parse import urlencode
 
@@ -54,6 +55,8 @@ def funding():
                        "gaps_over_12h": int((gaps > 12).sum()),
                        "event_count_distribution": daily.funding_count.value_counts().to_dict(),
                        "raw_snapshot": str(raw_path.relative_to(ROOT)),
+                       "raw_sha256": hashlib.sha256(raw_path.read_bytes()).hexdigest(),
+                       "source": "https://fapi.binance.com/fapi/v1/fundingRate",
                        "note": "No assumption of exactly three settlements/day; first day can be partial."})
         print(f"Funding {asset}: {len(frame)} events", flush=True)
     save_json(ROOT / "outputs/data_audit/funding.json", audits)
