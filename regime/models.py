@@ -75,6 +75,16 @@ class FittedHMM:
         output["state"] = ordered.argmax(axis=1)
         output["p_high_vol"] = ordered[:, self.stress_state]
         output["log_score"] = scores
+        initial_prior = self.model.startprob_ if previous is None else previous @ self.model.transmat_
+        priors = np.vstack([initial_prior, probabilities[:-1] @ self.model.transmat_])
+        priors[resets] = self.model.startprob_
+        j = self.columns.index("return")
+        return_emission = -.5 * (np.log(2 * np.pi * variance[:, j])
+            + (values[:, None, j] - self.model.means_[:, j]) ** 2 / variance[:, j])
+        output["return_log_score"] = logsumexp(np.log(np.clip(priors, 1e-300, 1)) + return_emission,
+                                                axis=1) - np.log(self.scaler.scale_[j])
+        raw_stress = self.order[self.stress_state]
+        output["next_high_vol"] = probabilities @ self.model.transmat_[:, raw_stress]
         output["entropy"] = -(ordered * np.log(np.clip(ordered, 1e-12, 1))).sum(axis=1)
         return output, probabilities[-1] if len(probabilities) else previous
 
@@ -123,7 +133,7 @@ def fit_hmm(frame, columns, k, seeds, max_iter=300, reference=None):
     return fitted
 
 
-def walk_forward(frame, columns, k, start, end, seeds, max_iter=300, freq="MS"):
+def walk_forward(frame, columns, k, start, end, seeds, max_iter=300, freq="MS", initial_seeds=None):
     start, end = pd.Timestamp(start, tz="UTC"), pd.Timestamp(end, tz="UTC")
     boundaries = pd.date_range(start, end + pd.Timedelta(days=1), freq=freq)
     boundaries = sorted(set([start, *boundaries, end + pd.Timedelta(days=1)]))
@@ -133,7 +143,8 @@ def walk_forward(frame, columns, k, start, end, seeds, max_iter=300, freq="MS"):
         evaluation = frame.loc[(frame.index >= left) & (frame.index < right)].dropna(subset=columns)
         if evaluation.empty:
             continue
-        fitted = fit_hmm(train, columns, k, seeds, max_iter, reference)
+        active_seeds = initial_seeds if reference is None and initial_seeds is not None else seeds
+        fitted = fit_hmm(train, columns, k, active_seeds, max_iter, reference)
         _, alpha = fitted.filter(train)
         if (evaluation.index[0] - train.index[-1]).days > 1:
             alpha = None

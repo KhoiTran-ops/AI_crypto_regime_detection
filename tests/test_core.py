@@ -89,3 +89,26 @@ def test_backtest_delays_execution_and_charges_actual_trades():
     assert result.weight.iloc[:2].eq(0).all()
     assert np.isclose(result.equity.iloc[-1], .999 / 1.001)
     assert result.turnover.sum() > 1.9
+
+
+def test_return_density_does_not_condition_on_todays_other_features():
+    from types import SimpleNamespace
+
+    from sklearn.preprocessing import StandardScaler
+
+    from regime.models import FittedHMM
+    columns = ["return", "rv30"]
+    scaler = StandardScaler().fit(pd.DataFrame([[-1, -1], [1, 1]], columns=columns))
+    model = SimpleNamespace(means_=np.array([[0., 0.], [0., 3.]]),
+                            covars_=np.array([[1., 1.], [4., 1.]]),
+                            startprob_=np.array([.5, .5]),
+                            transmat_=np.array([[.9, .1], [.2, .8]]))
+    fitted = FittedHMM(model, scaler, columns, np.array([0, 1]), {})
+    index = pd.date_range("2025-01-01", periods=2, tz="UTC")
+    before = pd.DataFrame([[.1, 0.], [.2, 0.]], columns=columns, index=index)
+    changed = before.copy()
+    changed.iloc[0, 1] = 3.
+    a, _ = fitted.filter(before)
+    b, _ = fitted.filter(changed)
+    assert a.return_log_score.iloc[0] == b.return_log_score.iloc[0]
+    assert a.p_high_vol.iloc[0] != b.p_high_vol.iloc[0]

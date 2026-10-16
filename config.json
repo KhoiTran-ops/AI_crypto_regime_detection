@@ -56,5 +56,11 @@
     11,
     23,
     37
-  ]
+  ],
+  "core_features": [
+    "return",
+    "rv30",
+    "volume_z"
+  ],
+  "feature_revision": "Train-only pilot rejected absolute volume: near-absorbing exchange-growth states. Relative volume uses prior 30 days only."
 }

@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 
-CORE_FEATURES = ["return", "rv30", "log_volume"]
+CORE_FEATURES = ["return", "rv30", "volume_z"]
 
 
 def build_features(spot):
