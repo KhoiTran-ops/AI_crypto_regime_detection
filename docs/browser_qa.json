@@ -1,0 +1,23 @@
+{
+  "revision": "v2_rng_fix",
+  "browser": "Edge, isolated headless profile",
+  "checks": [
+    "BTC renders with seven tabs",
+    "Downloaded PDF exactly matches published PDF",
+    "All seven BTC tabs render without exceptions",
+    "Full analysis-history chart and split boundaries render",
+    "All seven ETH tabs render without exceptions",
+    "Cost slider interaction does not raise an exception",
+    "390px mobile viewport has no page-level horizontal overflow"
+  ],
+  "errors": [],
+  "console": [],
+  "failed_requests": [],
+  "mobile": {
+    "viewport": 390,
+    "document": 390
+  },
+  "downloaded_pdf_sha256": "d4277b544dcd17a9665edbaac660cf6920696c384cdcd8995b3162d01af4682c",
+  "duration_seconds": 12.43,
+  "final_pdf_download_reverified": true
+}
