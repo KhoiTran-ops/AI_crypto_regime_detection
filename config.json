@@ -1,0 +1,40 @@
+{
+  "assets": [
+    "BTCUSDT",
+    "ETHUSDT"
+  ],
+  "raw_start": "2017-08-17",
+  "end": "2026-09-30",
+  "analysis_start": "2017-10-17",
+  "train_end": "2022-12-31",
+  "validation_start": "2023-01-01",
+  "validation_end": "2024-12-31",
+  "test_start": "2025-01-01",
+  "test_end": "2026-09-30",
+  "k": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "seeds": [
+    11,
+    23,
+    37,
+    51,
+    79
+  ],
+  "max_iter": 300,
+  "covariance": "diag",
+  "refit": "quarterly",
+  "cost_bps": [
+    5,
+    10,
+    25
+  ],
+  "annualization": 365,
+  "execution_delay_days": 2,
+  "volatility_target": 0.4,
+  "split_status": "candidate_requires_adequacy_report",
+  "bootstrap_samples": 500
+}

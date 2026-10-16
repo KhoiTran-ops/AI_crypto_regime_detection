@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-crypto-regime-detection"
+version = "0.1.0"
+description = "Reproducible Binance BTC/ETH regime research and Vietnamese dashboard"
+requires-python = ">=3.12"
+dependencies = ["numpy", "pandas", "scipy", "scikit-learn", "hmmlearn", "statsmodels", "plotly", "streamlit", "pyarrow"]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[project.scripts]
+crypto-regime = "regime.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["regime*"]
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.pytest.ini_options]
+addopts = "--basetemp=.tools/testtmp"
+testpaths = ["tests"]
+
