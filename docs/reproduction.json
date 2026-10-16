@@ -16,5 +16,9 @@
     "score_comparisons.csv",
     "portfolio_uncertainty.csv",
     "method_comparison.csv"
-  ]
+  ],
+  "clean_git_archive_verified": true,
+  "tracked_artifact_hashes_verified": 141,
+  "clean_checkout_loaded_its_own_source": true,
+  "code_and_results_commit_checked": "358e3a2d4e6f0a500a7b6ccad95365a5ef712910"
 }

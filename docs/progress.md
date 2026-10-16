@@ -21,7 +21,7 @@ Cập nhật 16/10/2026. Code nằm tại F:\AI_crypto\AI_crypto_regime_detectio
 | T18 Test | 638 ngày/tài sản, 9 mô hình/tài sản; có bootstrap paired blocks 30 ngày và Sharpe sensitivity 7/60. v2 đã hoàn tất; mọi refit cuối đều hội tụ và kết quả đã đối chiếu độc lập. |
 | T19–T20 Bài/bảng/hình | Bản thảo đầy đủ tiếng Việt, PDF, BibTeX, hình PNG/PDF và bảng. v2 đã đồng bộ; PDF 13 trang được render và kiểm tra trực quan, không có chữ vượt biên. |
 | T21–T22 Dashboard | 7 tab, BTC/ETH, dữ liệu/model/transition/derivatives/portfolio/methods. v2 đã qua Edge desktop/mobile, mọi tab BTC/ETH, tải PDF và đổi mức chi phí; không có lỗi console/mạng hoặc tràn ngang. |
-| T23 Tái lập | v1 audit phát hiện RNG không được kiểm soát và dừng đúng; đã sửa, có regression test. v2 đạt: 3.752 archive kiểm tra checksum, sáu dataset tái dựng khớp, refit sạch 18 mô hình; sai khác dự báo lớn nhất 0,0. Kiểm tra Git archive đang chốt. |
+| T23 Tái lập | v1 audit phát hiện RNG không được kiểm soát và dừng đúng; đã sửa, có regression test. v2 đạt: 3.752 archive kiểm tra checksum, sáu dataset tái dựng khớp, refit sạch 18 mô hình; sai khác dự báo lớn nhất 0,0. Bản Git archive sạch đã xác minh đủ 141 hash artifact và code khoa học, không cần raw để mở dashboard. |
 
 ## Kết quả và quyết định đã có
 
@@ -53,3 +53,7 @@ Archive hồi cứu; không có ground-truth regime; Gaussian diagonal và rolli
 - results/: 18 mô hình, bảng thống kê, ước lượng, bootstrap và danh mục; dùng chung với dashboard.
 - docs/reproduction.json, browser_qa.json, pdf_qa.json, tvtp_sanity.json: bằng chứng kiểm chứng.
 - docs/history/: protocol và bảng v1; đã khôi phục đúng byte và xác minh 9/9 tệp code khoa học v1 theo hash.
+
+## Nghiệm thu cuối
+
+Đã hoàn tất sản phẩm nghiên cứu và dashboard cục bộ; không còn lỗi kỹ thuật đang chặn. Working tree sẽ chốt sạch trong commit bàn giao. Chưa push/hosting. T01 về gắn folder trong UI và giới hạn historical vintages vẫn được ghi đúng phạm vi, không trình bày là đã xác minh.
