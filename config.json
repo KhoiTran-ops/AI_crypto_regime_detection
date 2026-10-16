@@ -20,13 +20,28 @@
   "seeds": [
     11,
     23,
-    37,
-    51,
-    79
+    35,
+    47,
+    59,
+    71,
+    83,
+    95,
+    107,
+    119,
+    131,
+    143,
+    155,
+    167,
+    179,
+    191,
+    203,
+    215,
+    227,
+    239
   ],
   "max_iter": 300,
   "covariance": "diag",
-  "refit": "quarterly",
+  "refit": "monthly",
   "cost_bps": [
     5,
     10,
@@ -36,5 +51,10 @@
   "execution_delay_days": 2,
   "volatility_target": 0.4,
   "split_status": "candidate_requires_adequacy_report",
-  "bootstrap_samples": 500
+  "bootstrap_samples": 500,
+  "refit_seeds": [
+    11,
+    23,
+    37
+  ]
 }

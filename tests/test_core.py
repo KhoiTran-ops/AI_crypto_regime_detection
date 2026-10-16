@@ -43,3 +43,49 @@ def test_funding_daily_calendar_is_utc(tmp_path, monkeypatch):
     derivatives.funding()
     daily = pd.read_parquet(tmp_path / 'data/processed/BTCUSDT_funding.parquet')
     assert len(daily) == 3 and daily.funding_count.eq(3).all()
+
+def test_forward_filter_matches_enumerated_paths():
+    from itertools import product
+
+    from regime.models import forward_filter
+    emission = np.array([[.8, .2], [.3, .7], [.6, .4]])
+    transition = np.array([[.9, .1], [.2, .8]])
+    initial = np.array([.4, .6])
+    probabilities, scores = forward_filter(np.log(emission), transition, initial)
+    for end in range(1, 4):
+        expected = np.zeros(2)
+        for path in product(range(2), repeat=end):
+            mass = initial[path[0]] * emission[0, path[0]]
+            for step in range(1, end):
+                mass *= transition[path[step-1], path[step]] * emission[step, path[step]]
+            expected[path[-1]] += mass
+        assert np.allclose(probabilities[end-1], expected / expected.sum())
+    assert np.isfinite(scores).all()
+
+
+def test_sequence_lengths_handle_pandas_microseconds():
+    from regime.models import sequence_lengths
+    index = pd.date_range('2020-01-01', periods=4, tz='UTC', unit='us')
+    assert sequence_lengths(index) == [4]
+    assert sequence_lengths(index.delete(2)) == [2, 1]
+
+def test_oi_uses_valid_fresh_snapshot_and_reports_bad_rows(tmp_path, monkeypatch):
+    from regime import derivatives
+    monkeypatch.setattr(derivatives, 'ROOT', tmp_path)
+    monkeypatch.setattr(derivatives, 'archive', lambda key: {'file': 'unused.zip'})
+    frame = pd.DataFrame({'create_time': ['2024-01-01 00:00:00', '2024-01-01 23:55:00'],
+                          'symbol': ['BTCUSDT']*2, 'sum_open_interest': [0, 10],
+                          'sum_open_interest_value': [0, 100]})
+    monkeypatch.setattr(derivatives, 'read_archive', lambda path: frame)
+    result = derivatives.oi_day('BTCUSDT', '2024-01-01')
+    assert result['oi'] == 10 and result['invalid_snapshots'] == 1
+
+def test_backtest_delays_execution_and_charges_actual_trades():
+    from regime.evaluation import backtest
+    index = pd.date_range('2025-01-01', periods=5, tz='UTC')
+    prices = pd.Series([100., 100., 200., 200., 200.], index=index)
+    signal = pd.Series(1., index=index)
+    result = backtest(prices, signal, cost_bps=10, delay=2)
+    assert result.weight.iloc[:2].eq(0).all()
+    assert np.isclose(result.equity.iloc[-1], .999 / 1.001)
+    assert result.turnover.sum() > 1.9

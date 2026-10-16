@@ -68,8 +68,13 @@ def oi_day(asset, day):
     selected["time"] = pd.to_datetime(selected.create_time, utc=True)
     selected["oi"] = pd.to_numeric(selected.sum_open_interest, errors="raise")
     selected["oi_quote"] = pd.to_numeric(selected.sum_open_interest_value, errors="raise")
-    if selected.symbol.ne(asset).any() or (selected[["oi", "oi_quote"]] <= 0).any().any():
-        raise ValueError(f"Invalid OI values: {key}")
+    if selected.symbol.ne(asset).any():
+        raise ValueError(f"Unexpected OI symbol: {key}")
+    valid = selected[["oi", "oi_quote"]].gt(0).all(axis=1)
+    invalid_count = int((~valid).sum())
+    selected = selected.loc[valid]
+    if selected.empty:
+        raise ValueError(f"No valid OI snapshot: {key}")
     conflicts = selected.groupby("time")[["oi", "oi_quote"]].nunique().gt(1).any(axis=1).sum()
     if conflicts:
         raise ValueError(f"Conflicting OI snapshots: {key}")
@@ -82,7 +87,8 @@ def oi_day(asset, day):
     age = ((date + pd.Timedelta(days=1)) - last.time).total_seconds() / 60
     return {"date": date, "oi": last.oi if age <= 15 else float("nan"),
             "oi_quote": last.oi_quote if age <= 15 else float("nan"),
-            "oi_age_minutes": age, "snapshots": len(selected), "duplicates": duplicates}
+            "oi_age_minutes": age, "snapshots": len(selected), "duplicates": duplicates,
+            "invalid_snapshots": invalid_count}
 
 
 def open_interest(workers=6):
@@ -110,6 +116,7 @@ def open_interest(workers=6):
         audits.append({"asset": asset, "expected_days": len(days), "valid_days": int(frame.oi.notna().sum()),
                        "coverage": float(frame.oi.notna().mean()), "failures": failures,
                        "duplicate_snapshots": int(frame.duplicates.sum()),
+                       "invalid_snapshots": int(frame.invalid_snapshots.sum()),
                        "rule": "Last snapshot before midnight; age <=15 minutes; duplicates verified identical."})
         save_json(ROOT / "outputs/data_audit/oi.json", audits)
     return audits
