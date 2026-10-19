@@ -21,8 +21,15 @@ def verify():
     for name, expected in lock["scientific_code"].items():
         if hashlib.sha256((ROOT / name.replace("\\", "/")).read_bytes()).hexdigest() != expected:
             raise ValueError(f"Scientific code changed after protocol lock: {name}")
-    if hashlib.sha256((ROOT / "requirements.lock").read_bytes()).hexdigest() != lock["requirements_hash"]:
-        raise ValueError("Locked dependency file changed")
+    current = (ROOT / "requirements.lock").read_bytes()
+    if hashlib.sha256(current).hexdigest() != lock["requirements_hash"]:
+        baseline = (ROOT / "docs/history/requirements_baseline.lock").read_bytes()
+        original_pins = {line for line in baseline.decode().splitlines() if line.strip()}
+        current_pins = {line for line in current.decode().splitlines() if line.strip()}
+        # Explicit additive extension: none of the original scientific dependencies may change.
+        if (hashlib.sha256(baseline).hexdigest() != lock["requirements_hash"]
+                or current_pins != original_pins | {"hdbscan==0.8.44"}):
+            raise ValueError("Baseline dependency pins changed beyond the declared HDBSCAN extension")
     print(f"Verified {len(manifest)} artifact hashes and all locked scientific source files", flush=True)
 
 
@@ -96,3 +103,30 @@ def reproduce():
         "not_claimed": "Second cold installation, historical data vintages or a second independent data provider"}
     save_json(ROOT / "docs/reproduction.json", report)
     print(json.dumps(report), flush=True)
+
+
+def seal_extensions():
+    """Hash redistributable findings, never third-party source observations."""
+    folder = ROOT / "results/extensions"
+    files = [path for path in folder.iterdir() if path.is_file()
+             and path.name not in ("artifact_hashes.json", "external_panel.parquet")
+             and not path.name.endswith("_features.parquet")]
+    save_json(folder / "artifact_hashes.json", {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(files)})
+
+
+def verify_extensions():
+    verify()
+    folder = ROOT / "results/extensions"
+    protocol = json.loads((folder / "protocol.json").read_text(encoding="utf-8"))
+    checked_inputs = protocol["hashes"] | protocol.get("supply_addendum", {}).get("hashes", {})
+    for name, expected in checked_inputs.items():
+        if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
+            raise ValueError("Extension input/source changed: " + name)
+    artifacts = json.loads((folder / "artifact_hashes.json").read_text(encoding="utf-8"))
+    for name, expected in artifacts.items():
+        if hashlib.sha256((folder / name).read_bytes()).hexdigest() != expected:
+            raise ValueError("Extension artifact changed: " + name)
+    if json.loads((folder / "run.json").read_text(encoding="utf-8"))["fingerprint"] != protocol["fingerprint"]:
+        raise ValueError("Run and extension protocol differ")
+    print(f"Verified {len(artifacts)} extension artifacts and {len(protocol['hashes'])} locked inputs", flush=True)

@@ -42,15 +42,11 @@ run = read_json("run.json")
 with st.sidebar:
     st.markdown("## ◉ Regime Radar")
     asset = st.selectbox("Tài sản", run["assets"], format_func=lambda item: item.replace("USDT", " / USDT"))
-    st.caption("Dữ liệu Binance · ngày UTC")
+    st.caption("Binance và nguồn bổ sung · ngày UTC")
     st.divider()
     st.markdown("**Phạm vi đánh giá cuối**")
     st.write("01/01/2025 – 30/09/2026")
-    st.caption("Các lựa chọn mô hình được khóa trước khi đánh giá giai đoạn này.")
-    pdf = ROOT / "paper/bao_cao_nghien_cuu.pdf"
-    if pdf.exists():
-        st.download_button("Tải bài nghiên cứu PDF", pdf.read_bytes(),
-                           file_name="bao_cao_nghien_cuu.pdf", mime="application/pdf")
+    st.caption("Phần mở rộng là đánh giá hồi cứu; kỳ test đã được quan sát.")
     report = ROOT / "paper/bao_cao_nghien_cuu.md"
     if report.exists():
         st.download_button("Tải bản thảo nghiên cứu", report.read_bytes(),
@@ -82,7 +78,7 @@ st.caption(f"Xác suất trạng thái σ cao nhất ở ngày tiếp theo: {las
            "Các mã R được ghép theo đặc trưng qua từng lần ước lượng; không áp đặt nhãn bull/bear.")
 
 tabs = st.tabs(["Diễn biến", "Mô hình", "Danh mục & rủi ro", "Chuyển trạng thái",
-                "Funding & OI", "BTC / ETH", "Dữ liệu & phương pháp"])
+                "Funding & OI", "BTC / ETH", "Dữ liệu & phương pháp", "Dữ liệu & mô hình mở rộng"])
 
 with tabs[0]:
     selected = st.date_input("Khoảng thời gian", (prediction.index[0].date(), latest_date.date()),
@@ -243,3 +239,8 @@ with tabs[6]:
     with st.expander("Thiết kế đã khóa"):
         st.json(read_json("protocol_lock.json"))
     st.caption(f"Mã phiên bản nghiên cứu: {run['protocol_hash'][:16]}")
+
+
+with tabs[7]:
+    from regime.extension_dashboard import render_extensions
+    render_extensions(asset, chart)

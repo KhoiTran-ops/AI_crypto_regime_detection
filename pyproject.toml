@@ -7,7 +7,7 @@ name = "ai-crypto-regime-detection"
 version = "0.1.0"
 description = "Reproducible Binance BTC/ETH regime research and Vietnamese dashboard"
 requires-python = ">=3.12"
-dependencies = ["numpy", "pandas", "scipy", "scikit-learn", "hmmlearn", "statsmodels", "plotly", "streamlit", "pyarrow", "matplotlib"]
+dependencies = ["numpy", "pandas", "scipy", "scikit-learn", "hmmlearn", "statsmodels", "plotly", "streamlit", "pyarrow", "matplotlib", "hdbscan==0.8.44"]
 
 [project.optional-dependencies]
 dev = ["pytest", "ruff", "playwright"]

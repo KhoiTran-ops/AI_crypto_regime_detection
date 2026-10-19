@@ -1,0 +1,31 @@
+{
+  "BTCUSDT": {
+    "source": "Train-only HMM diagnostics through 2022-12-31; parameters not estimated on validation/test",
+    "hazard_candidates": [
+      0.047615371982384636,
+      0.037534487458473875,
+      0.03851968295911756,
+      0.024517343658250423
+    ],
+    "cluster_size_candidates": [
+      202,
+      527
+    ],
+    "n_train": 1902
+  },
+  "ETHUSDT": {
+    "source": "Train-only HMM diagnostics through 2022-12-31; parameters not estimated on validation/test",
+    "hazard_candidates": [
+      0.04220234309938453,
+      0.07606443782687788,
+      0.08521824973435488,
+      0.055028254520133046,
+      0.026253681882630997
+    ],
+    "cluster_size_candidates": [
+      230,
+      570
+    ],
+    "n_train": 1902
+  }
+}

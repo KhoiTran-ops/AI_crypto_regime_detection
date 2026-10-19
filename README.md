@@ -1,5 +1,37 @@
 # AI Crypto Regime Detection
 
+**Cập nhật 19/10/2026:** bổ sung FRED (VIX, Treasury, S&P500), ICE DXY qua Yahoo, Coin Metrics (vốn hóa), DefiLlama (stablecoin/TVL); giữ OHLCV/funding/OI Binance đã có. Thêm TVTP macro/crypto/liquidity, HDBSCAN, BOCPD và independent MS-GARCH. Chia mẫu và ngưỡng RMSE của bản gốc **chưa thay đổi** theo yêu cầu người dùng. Các mở rộng là phân tích hồi cứu, không có holdout mới untouched.
+
+## Clone và mở kết quả
+
+Cần Python 3.12. Sau khi clone, chạy tại thư mục repo:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.lock
+.\.venv\Scripts\python.exe -m streamlit run dashboard.py
+```
+
+Linux/macOS: `python3.12 -m venv .venv`, `.venv/bin/python -m pip install -r requirements.lock`, `.venv/bin/python -m streamlit run dashboard.py`.
+
+Dashboard mở được bảng kết quả gốc và mở rộng từ các artifact trong Git, không cần raw/cache từ máy tác giả. Muốn xem chuỗi ngoại sinh, bấm **Tải dữ liệu bổ sung** trong tab mở rộng hoặc chạy:
+
+```powershell
+.\.venv\Scripts\python.exe -m regime.cli external-data
+.\.venv\Scripts\python.exe -m regime.cli extend
+```
+
+Lệnh thứ nhất tải bổ sung miễn phí, không cần API key, chuẩn hóa UTC/đơn vị và đối chiếu hash dữ liệu đã chốt. Lệnh thứ hai tái tính các thí nghiệm bổ sung; dùng cache có kiểm tra nguồn/config/code, không tạo PDF hoặc gọi bước publish/adequacy. File core `config.json`, `regime/adequacy.py` và các bảng kết quả gốc được kiểm tra giữ nguyên.
+
+Dữ liệu ngoại sinh gốc và panel đầy đủ **không đưa vào Git** vì SP500 có hạn chế phân phối lại; script tải và manifest/hash vẫn có trong repo. Tái lập phụ thuộc nguồn tiếp tục cung cấp cùng lịch sử: nếu nguồn sửa quá khứ hoặc hết cửa sổ lịch sử (FRED SP500 chỉ giữ 10 năm), pipeline dừng rõ ràng thay vì âm thầm nhận dữ liệu khác. Đây không phải cam kết archive tồn tại vĩnh viễn.
+
+Kết quả: `results/extensions/model_scores.csv`, `score_comparisons.csv`, `portfolio_performance.csv`, `sample_counts.csv`, `liquidity_profiles.csv`, prediction/coefficients/diagnostics theo mô hình. Cơ sở và giả định: [EXTERNAL_METHODS](docs/EXTERNAL_METHODS.md). Spec: [CAPABILITY_MAP](CAPABILITY_MAP.md); plan: [tasks/plan.md](tasks/plan.md), trạng thái: [tasks/todo.md](tasks/todo.md).
+
+Không sinh bài/PDF mới trong lượt này. Bài và PDF bên dưới là **bản gốc Binance-only ngày 16/10**, chưa bao gồm thí nghiệm mở rộng.
+
+---
+
+
 Nghiên cứu BTC/USDT và ETH/USDT từ Binance, kèm dashboard tiếng Việt. Dữ liệu spot raw từ **17/08/2017**, snapshot đến **30/09/2026 UTC**. Nguồn miễn phí, không cần API key.
 
 **Kết quả chính:** quy tắc validation + recovery chọn BTC 4 trạng thái, ETH 5 trạng thái trong lưới 2–5. HMM có joint density tốt hơn GMM, nhưng chiến lược regime-aware của HMM chính không cải thiện volatility targeting trong test sau chi phí. Không coi việc phân tách regime là bằng chứng tạo alpha.

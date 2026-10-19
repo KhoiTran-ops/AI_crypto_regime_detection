@@ -13,5 +13,5 @@ As-of join chỉ sau available_date, lưu tuổi quan sát; weekend chỉ giữ 
 Archive hồi cứu không chứng nhận historical vintages. Đánh giá trễ thêm một tuần như timing sensitivity (một chu kỳ báo cáo tuần), không gọi là tối ưu.
 ## Chạy và nghiệm thu
 python -m regime.cli external-data
-Snapshot chuẩn hóa nhỏ được đưa vào Git; raw/hash manifest để tái tải. Cài môi trường từ lock; không yêu cầu API key.
-Mặc định dùng frozen snapshot; tải lại phải --refresh và thay đổi hash phải ghi phiên bản. Không ghi đè baseline.
+Git giữ schema, source URLs và hash của snapshot chuẩn hóa; dữ liệu gốc/chuẩn hóa bên ngoài được tải cục bộ, không phân phối lại chuỗi SP500. Cài môi trường từ lock; không yêu cầu API key.
+Mặc định dùng snapshot cục bộ nếu có; clone mới tự tải và kiểm tra hash chuẩn hóa đã công bố. Provider sửa lịch sử sẽ dừng thay vì âm thầm thay dữ liệu. Không ghi đè baseline.
