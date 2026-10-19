@@ -6,6 +6,8 @@
 - [x] E05 HDBSCAN và BOCPD causal ngoài mẫu.
 - [x] E06 MS-GARCH independent variance và sanity.
 - [x] E07 Kết quả/danh mục/độ nhạy và dashboard.
-- [ ] E08 Clone sạch, test gọn, kiểm chứng invariants, bàn giao.
+- [x] E08 Clone sạch, test gọn, kiểm chứng invariants, bàn giao.
 
 Kết quả: 30 cấu hình bổ sung cho hai tài sản, 638 ngày/cấu hình; tất cả refit cuối hội tụ. HDBSCAN_DENSITY chọn min_cluster_size BTC17/ETH23 trên train; các cấu hình thô thất bại vẫn giữ.
+
+E08 đạt: clone sạch cài 63 pin, 14 tests, tải lại nguồn/khớp hash; verify 141 artifacts gốc +189 artifacts mở rộng/14 inputs; UI BTC/ETH và Edge desktop/mobile đã qua. Không sinh PDF; chưa push.

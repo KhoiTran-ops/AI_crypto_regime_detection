@@ -1,3 +1,5 @@
+> Cập nhật 19/10/2026: đã mở rộng ngoài Binance-only với 30 cấu hình bổ sung. Xem [task mới](../tasks/todo.md), [phương pháp mở rộng](EXTERNAL_METHODS.md) và [QA](extension_qa.json). Nội dung 16/10 bên dưới được giữ như lịch sử bản gốc; bài/PDF cũ chưa cập nhật.
+
 # Tiến trình triển khai và bàn giao
 
 Cập nhật 16/10/2026. Code nằm tại F:\AI_crypto\AI_crypto_regime_detection; remote GitHub đã cấu hình. Chưa push.

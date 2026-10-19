@@ -15,5 +15,9 @@
   "app_test": "BTC/ETH with TVTP_MACRO, TVTP_SUPPLY, MSGARCH, BOCPD and HDBSCAN branches passed",
   "pdf_generated": false,
   "scope": "Retrospective extension; sample boundaries and RMSE gate unchanged",
-  "pending": "Final cloned result verification and browser interaction after publication"
+  "clone_final": "Passed: 189 extension artifacts, 14 locked inputs, fast extend, BTC/ETH dashboard using cloned source and fresh venv",
+  "fresh_environment_note": "Dependency wheel cache reused; no original raw data or prediction cache copied outside Git",
+  "browser_final": "Passed: eight real Edge model/asset interactions, nominal supply selector, 390px mobile, no page errors/overflow",
+  "source_series": 10,
+  "git_tracked_size_mb": 14.96
 }

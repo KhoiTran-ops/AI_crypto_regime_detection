@@ -1,0 +1,40 @@
+{
+  "browser": "Edge isolated headless",
+  "cases": [
+    [
+      "BTC / USDT",
+      "TVTP_MACRO"
+    ],
+    [
+      "BTC / USDT",
+      "MSGARCH"
+    ],
+    [
+      "BTC / USDT",
+      "BOCPD"
+    ],
+    [
+      "BTC / USDT",
+      "HDBSCAN_DENSITY"
+    ],
+    [
+      "ETH / USDT",
+      "TVTP_MACRO"
+    ],
+    [
+      "ETH / USDT",
+      "MSGARCH"
+    ],
+    [
+      "ETH / USDT",
+      "BOCPD"
+    ],
+    [
+      "ETH / USDT",
+      "HDBSCAN_DENSITY"
+    ]
+  ],
+  "mobile_width": 390,
+  "horizontal_overflow": false,
+  "page_errors": []
+}

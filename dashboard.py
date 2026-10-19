@@ -49,7 +49,7 @@ with st.sidebar:
     st.caption("Phần mở rộng là đánh giá hồi cứu; kỳ test đã được quan sát.")
     report = ROOT / "paper/bao_cao_nghien_cuu.md"
     if report.exists():
-        st.download_button("Tải bản thảo nghiên cứu", report.read_bytes(),
+        st.download_button("Tải bản thảo gốc (16/10)", report.read_bytes(),
                            file_name="bao_cao_nghien_cuu.md", mime="text/markdown")
     st.download_button("Tải bảng hiệu quả danh mục",
                        (RESULTS / "portfolio_performance.csv").read_bytes(),
