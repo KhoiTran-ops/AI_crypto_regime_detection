@@ -21,3 +21,10 @@ outputs/research/adequacy/*
 !outputs/research/adequacy/decisions.json
 
 outputs/prior_runs/
+
+# Third-party observations are downloaded locally; Git stores hashes and aggregate findings.
+data/snapshots/external_raw.zip
+data/snapshots/external_observations.parquet
+outputs/external_download.json
+results/extensions/external_panel.parquet
+results/extensions/*_features.parquet

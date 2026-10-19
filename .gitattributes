@@ -11,3 +11,6 @@ requirements.lock -text
 results/** -text
 paper/** -text
 docs/history/** -text
+
+*.zip binary
+data/snapshots/*.json -text

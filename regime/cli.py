@@ -5,8 +5,15 @@ import argparse
 def main():
     parser = argparse.ArgumentParser(description="Binance crypto regime research")
     parser.add_argument("command", choices=["data", "select", "adequacy", "evaluate", "intervals",
-                                            "publish", "verify", "reproduce", "all"])
+                                            "publish", "verify", "reproduce", "external-data", "extend", "all"])
+    parser.add_argument("--refresh", action="store_true", help="Download external data only in a new snapshot checkout")
     args = parser.parse_args()
+    if args.command == "external-data":
+        from .external import build_external
+        build_external(refresh=args.refresh)
+    if args.command == "extend":
+        from .extensions import run_extensions
+        run_extensions()
     if args.command in ("data", "all"):
         from .data import build_spot, download_spot
         from .derivatives import funding, open_interest

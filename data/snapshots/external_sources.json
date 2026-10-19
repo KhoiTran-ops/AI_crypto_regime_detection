@@ -1,0 +1,12 @@
+{
+  "normalized_observations_sha256": "01a954c27b66a1738ab6952a6b8668d1a9a24d3fe119f9c42306d77dca1cf88b",
+  "cutoff": "2026-09-30",
+  "sources": {
+    "fred": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS,DGS10,DGS2,SP500&cosd=2017-08-17&coed=2026-09-30",
+    "dxy": "https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB?period1=1502928000&period2=1790812800&interval=1d",
+    "capitalization": "https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc,eth&metrics=CapMrktCurUSD&start_time=2017-08-17&end_time=2026-09-30&page_size=10000",
+    "stablecoins": "https://stablecoins.llama.fi/stablecoincharts/all",
+    "tvl": "https://api.llama.fi/v2/historicalChainTvl"
+  },
+  "redistribution": "Download external data locally. Do not redistribute SP500 observations without provider permission."
+}
