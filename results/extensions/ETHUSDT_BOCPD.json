@@ -1,0 +1,10 @@
+{
+  "fingerprint": "8445c267a9404786eec7260ae39fca717e1cc55ba84a715124a09f5f85c4be17",
+  "decision": {
+    "hazard": 0.026253681882630997,
+    "prior_weight": 1.0,
+    "validation_log_score": 2.1305628022719216
+  },
+  "diagnostics": [],
+  "sha256": "faccc5b53bf2cdde70a296ea1bf528a98bc89c724d6b51dca0c47b182bf614b9"
+}

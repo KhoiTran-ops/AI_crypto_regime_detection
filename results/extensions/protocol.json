@@ -1,0 +1,122 @@
+{
+  "fingerprint": "8445c267a9404786eec7260ae39fca717e1cc55ba84a715124a09f5f85c4be17",
+  "hashes": {
+    "config.json": "ab1b99bcde79e895b112652093f0cb5f720c978a9239608962dbe6216bef0b0e",
+    "requirements.lock": "33449ba432cd5e7c8a49829fb923d92287e55dd8b49090a5cf643745f22effc8",
+    "regime/external.py": "bcfdd293044b7d494615b8acf896c45b6fbc794aa80aa74d917eb01bb1ef69ce",
+    "regime/advanced.py": "f00570e9242d9b0c898475df01a877a38676d27fefbd112ea44a35589ac53c30",
+    "regime/extensions.py": "5eacfc687a51ad285b99fd9b9c5fa650920cf0822e34600923baff14cc4ba085",
+    "regime/benchmarks.py": "00482c9c53ebba450980f71589b436a86de700c5406887c96e81af6153214835",
+    "regime/evaluation.py": "7dd1c176798e59e2c5b8b7de62a40dede30682f16c4ef3cc07c3696fba1f87e1",
+    "data/snapshots/external_sources.json": "b90f73a724a037283adb87fc998f29f7501ccf70fb6da4098d54c995d6fd7fa5",
+    "data/snapshots/extension_calibration.json": "bd828bdb29130713a53a38d8d98969740e3a54f177d81898861e6eb9230a5b78",
+    "results/BTCUSDT_market.parquet": "b6d2d15fa29b945e0d3630f277a9fad8620e0ade5a8218ce2b6a0e6222820544",
+    "results/ETHUSDT_market.parquet": "f258ac481383001c5613c4f1cfd8190a27577807709243870cab9ef16659f3e1"
+  },
+  "config": {
+    "assets": [
+      "BTCUSDT",
+      "ETHUSDT"
+    ],
+    "raw_start": "2017-08-17",
+    "end": "2026-09-30",
+    "analysis_start": "2017-10-17",
+    "train_end": "2022-12-31",
+    "validation_start": "2023-01-01",
+    "validation_end": "2024-12-31",
+    "test_start": "2025-01-01",
+    "test_end": "2026-09-30",
+    "k": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "seeds": [
+      11,
+      23,
+      35,
+      47,
+      59,
+      71,
+      83,
+      95,
+      107,
+      119,
+      131,
+      143,
+      155,
+      167,
+      179,
+      191,
+      203,
+      215,
+      227,
+      239
+    ],
+    "max_iter": 300,
+    "covariance": "diag",
+    "refit": "monthly",
+    "cost_bps": [
+      5,
+      10,
+      25
+    ],
+    "annualization": 365,
+    "execution_delay_days": 2,
+    "volatility_target": 0.4,
+    "split_status": "candidate_requires_adequacy_report",
+    "bootstrap_samples": 500,
+    "refit_seeds": [
+      11,
+      23,
+      37
+    ],
+    "core_features": [
+      "return",
+      "rv30",
+      "volume_z"
+    ],
+    "feature_revision": "Train-only pilot rejected absolute volume: near-absorbing exchange-growth states. Relative volume uses prior 30 days only."
+  },
+  "status": "Retrospective extension; existing holdout already observed; split and recovery gate unchanged",
+  "availability": "Next US business day / UTC day assumption, plus lag2; MACRO_DELAY7 sensitivity",
+  "groups": {
+    "MACRO": [
+      "log_vix",
+      "dxy_last_session_return",
+      "ust10_change",
+      "sp500_last_session_return"
+    ],
+    "CRYPTO": [
+      "stablecoin_cap_growth",
+      "defi_tvl_growth",
+      "market_cap_growth"
+    ],
+    "LIQUIDITY": [
+      "log_illiquidity30",
+      "btc_eth_corr30"
+    ]
+  },
+  "no_pdf_generated": true,
+  "supply_addendum": {
+    "hashes": {
+      "regime/supply.py": "a140bc12d8106fbc6267cebf26b12c389e30af8c97be0f91cf96bdad25027372",
+      "data/snapshots/supply_source.json": "b942c54aa88e09bc0301159b6eaf91b380f02a3263144639bc4d66a57e6e2ec0"
+    },
+    "fingerprint": "02b05e6ac81edd4377866391095369972e81cbfdf8f1550aba4cad93e4b8f25d",
+    "covariates": [
+      "stablecoin_supply_growth",
+      "defi_tvl_growth",
+      "market_cap_growth"
+    ],
+    "reason": "Separate pure nominal supply growth from mark-to-market stablecoin capitalization; no price duplication"
+  },
+  "density_addendum": {
+    "fingerprint": "411af33cef6ae482a36f010b8a4ed6ad32e58484848d5f67987e449a7be5bf3f",
+    "hashes": {
+      "regime/hdbscan_density.py": "2ca8fa2c9d5353f3e451c4905dd5b832cbc5dbb632c2a7eee340ac9cfd4abf34"
+    },
+    "criterion": "Train-only relative_validity_ (DBCV approximation), not ground-truth accuracy"
+  }
+}

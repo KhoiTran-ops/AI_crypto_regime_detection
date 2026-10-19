@@ -1,0 +1,19 @@
+{
+  "unit_tests": 14,
+  "new_tests": 5,
+  "baseline_artifacts_verified": 141,
+  "baseline_scientific_files_unchanged": 9,
+  "baseline_invariant_hashes_unchanged": 128,
+  "extension_models": 30,
+  "nonconverged_refits": 0,
+  "all_extension_test_days": [
+    638
+  ],
+  "clone_environment": "Separate venv, 63 exact dependency pins, no original raw/cache copied",
+  "clone_stage_1": "14 tests passed; 141 baseline artifacts verified; external-data re-downloaded and normalized hashes matched for nine series and separate nominal supply",
+  "browser_initial": "Edge isolated desktop 1440px and mobile390px, no page errors or horizontal overflow",
+  "app_test": "BTC/ETH with TVTP_MACRO, TVTP_SUPPLY, MSGARCH, BOCPD and HDBSCAN branches passed",
+  "pdf_generated": false,
+  "scope": "Retrospective extension; sample boundaries and RMSE gate unchanged",
+  "pending": "Final cloned result verification and browser interaction after publication"
+}

@@ -1,0 +1,223 @@
+{
+  "fingerprint": "8445c267a9404786eec7260ae39fca717e1cc55ba84a715124a09f5f85c4be17",
+  "decision": {
+    "min_cluster_size": 527,
+    "min_samples": 4,
+    "selection": "Both empirical train occupancy endpoints reported; no winner selected on test",
+    "validation_noise_fraction": 1.0,
+    "validation_membership_strength": "0.0"
+  },
+  "diagnostics": [
+    {
+      "period": "2025-01-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-02-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-03-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-04-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-05-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-06-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-07-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-08-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-09-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-10-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-11-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2025-12-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2026-01-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2026-02-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2026-03-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2026-04-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2026-05-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2026-06-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2026-07-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2026-08-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    },
+    {
+      "period": "2026-09-01 00:00:00+00:00",
+      "clusters": 0,
+      "train_noise_fraction": 1.0,
+      "validation_or_test_noise_fraction": 1.0,
+      "cluster_persistence": [],
+      "warnings": [
+        "Clusterer does not have any defined clusters, new data will be automatically predicted as noise."
+      ]
+    }
+  ],
+  "sha256": "f93043dd185cac4a88d49f50c829250024f472dacd8be3ad4ba0a98617df7727"
+}

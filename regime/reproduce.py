@@ -108,6 +108,10 @@ def reproduce():
 def seal_extensions():
     """Hash redistributable findings, never third-party source observations."""
     folder = ROOT / "results/extensions"
+    from datetime import datetime, timezone
+    record = json.loads((folder / "run.json").read_text(encoding="utf-8"))
+    record["assembled_at_utc"] = datetime.now(timezone.utc).isoformat()
+    save_json(folder / "run.json", record)
     files = [path for path in folder.iterdir() if path.is_file()
              and path.name not in ("artifact_hashes.json", "external_panel.parquet")
              and not path.name.endswith("_features.parquet")]
@@ -119,7 +123,8 @@ def verify_extensions():
     verify()
     folder = ROOT / "results/extensions"
     protocol = json.loads((folder / "protocol.json").read_text(encoding="utf-8"))
-    checked_inputs = protocol["hashes"] | protocol.get("supply_addendum", {}).get("hashes", {})
+    checked_inputs = (protocol["hashes"] | protocol.get("supply_addendum", {}).get("hashes", {})
+                      | protocol.get("density_addendum", {}).get("hashes", {}))
     for name, expected in checked_inputs.items():
         if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
             raise ValueError("Extension input/source changed: " + name)
@@ -129,4 +134,4 @@ def verify_extensions():
             raise ValueError("Extension artifact changed: " + name)
     if json.loads((folder / "run.json").read_text(encoding="utf-8"))["fingerprint"] != protocol["fingerprint"]:
         raise ValueError("Run and extension protocol differ")
-    print(f"Verified {len(artifacts)} extension artifacts and {len(protocol['hashes'])} locked inputs", flush=True)
+    print(f"Verified {len(artifacts)} extension artifacts and {len(checked_inputs)} locked inputs", flush=True)

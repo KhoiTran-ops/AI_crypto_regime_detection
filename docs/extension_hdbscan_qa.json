@@ -1,0 +1,69 @@
+{
+  "scope": "Initial train/validation only; diagnostic sensitivity, not post-test model selection",
+  "cases": [
+    {
+      "asset": "BTCUSDT",
+      "min_cluster_size": 202,
+      "min_samples": 4,
+      "validation_noise_fraction": 1.0,
+      "validation_mean_strength": 0.0,
+      "train_clusters": 0
+    },
+    {
+      "asset": "BTCUSDT",
+      "min_cluster_size": 202,
+      "min_samples": null,
+      "validation_noise_fraction": 1.0,
+      "validation_mean_strength": 0.0,
+      "train_clusters": 0
+    },
+    {
+      "asset": "BTCUSDT",
+      "min_cluster_size": 527,
+      "min_samples": 4,
+      "validation_noise_fraction": 1.0,
+      "validation_mean_strength": 0.0,
+      "train_clusters": 0
+    },
+    {
+      "asset": "BTCUSDT",
+      "min_cluster_size": 527,
+      "min_samples": null,
+      "validation_noise_fraction": 1.0,
+      "validation_mean_strength": 0.0,
+      "train_clusters": 0
+    },
+    {
+      "asset": "ETHUSDT",
+      "min_cluster_size": 230,
+      "min_samples": 4,
+      "validation_noise_fraction": 1.0,
+      "validation_mean_strength": 0.0,
+      "train_clusters": 0
+    },
+    {
+      "asset": "ETHUSDT",
+      "min_cluster_size": 230,
+      "min_samples": null,
+      "validation_noise_fraction": 1.0,
+      "validation_mean_strength": 0.0,
+      "train_clusters": 0
+    },
+    {
+      "asset": "ETHUSDT",
+      "min_cluster_size": 570,
+      "min_samples": 4,
+      "validation_noise_fraction": 1.0,
+      "validation_mean_strength": 0.0,
+      "train_clusters": 0
+    },
+    {
+      "asset": "ETHUSDT",
+      "min_cluster_size": 570,
+      "min_samples": null,
+      "validation_noise_fraction": 1.0,
+      "validation_mean_strength": 0.0,
+      "train_clusters": 0
+    }
+  ]
+}

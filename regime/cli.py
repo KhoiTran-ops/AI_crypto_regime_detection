@@ -7,16 +7,25 @@ def main():
     parser.add_argument("command", choices=["data", "select", "adequacy", "evaluate", "intervals",
                                             "publish", "verify", "reproduce", "external-data", "extend", "verify-extensions", "all"])
     parser.add_argument("--refresh", action="store_true", help="Download external data only in a new snapshot checkout")
+    parser.add_argument("--recompute", action="store_true", help="Rebuild extension data/summaries; valid model caches are retained")
     args = parser.parse_args()
     if args.command == "external-data":
         from .external import build_external
         from .supply import add_supply
         add_supply(build_external(refresh=args.refresh))
     if args.command == "extend":
+        from .data import ROOT
+        if (ROOT / "results/extensions/artifact_hashes.json").exists() and not args.recompute:
+            from .reproduce import verify_extensions
+            verify_extensions()
+            print("Published extension results reused. --recompute rebuilds data/summaries using valid model caches.")
+            return
         from .extensions import run_extensions
         run_extensions()
         from .supply import run_supply
         run_supply()
+        from .hdbscan_density import run_density
+        run_density()
         from .reproduce import seal_extensions
         seal_extensions()
     if args.command == "verify-extensions":

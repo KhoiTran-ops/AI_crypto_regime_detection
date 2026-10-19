@@ -1,6 +1,6 @@
 # AI Crypto Regime Detection
 
-**Cập nhật 19/10/2026:** bổ sung FRED (VIX, Treasury, S&P500), ICE DXY qua Yahoo, Coin Metrics (vốn hóa), DefiLlama (stablecoin/TVL); giữ OHLCV/funding/OI Binance đã có. Thêm TVTP macro/crypto/liquidity, HDBSCAN, BOCPD và independent MS-GARCH. Chia mẫu và ngưỡng RMSE của bản gốc **chưa thay đổi** theo yêu cầu người dùng. Các mở rộng là phân tích hồi cứu, không có holdout mới untouched.
+**Cập nhật 19/10/2026:** bổ sung FRED (VIX, Treasury, S&P500), ICE DXY qua Yahoo, Coin Metrics (vốn hóa), DefiLlama (stablecoin/TVL); giữ OHLCV/funding/OI Binance đã có. Thêm TVTP macro/crypto/liquidity/supply, HDBSCAN (cả chọn theo density), BOCPD và independent MS-GARCH. Chia mẫu và ngưỡng RMSE của bản gốc **chưa thay đổi** theo yêu cầu người dùng. Các mở rộng là phân tích hồi cứu, không có holdout mới untouched.
 
 ## Clone và mở kết quả
 
@@ -21,7 +21,7 @@ Dashboard mở được bảng kết quả gốc và mở rộng từ các artif
 .\.venv\Scripts\python.exe -m regime.cli extend
 ```
 
-Lệnh thứ nhất tải bổ sung miễn phí, không cần API key, chuẩn hóa UTC/đơn vị và đối chiếu hash dữ liệu đã chốt. Lệnh thứ hai tái tính các thí nghiệm bổ sung; dùng cache có kiểm tra nguồn/config/code, không tạo PDF hoặc gọi bước publish/adequacy. File core `config.json`, `regime/adequacy.py` và các bảng kết quả gốc được kiểm tra giữ nguyên.
+Lệnh thứ nhất tải bổ sung miễn phí, không cần API key, chuẩn hóa UTC/đơn vị và đối chiếu hash dữ liệu đã chốt. Lệnh thứ hai xác minh và tái sử dụng kết quả công bố nếu có; `extend --recompute` dựng lại dữ liệu/bảng với cache mô hình hợp lệ. Khi chưa có kết quả mới, `extend` thực hiện fit toàn bộ. Không tạo PDF hoặc gọi publish/adequacy. Chạy `python -m regime.cli verify-extensions` để kiểm tra độc lập. File core `config.json`, `regime/adequacy.py` và các bảng kết quả gốc được kiểm tra giữ nguyên.
 
 Dữ liệu ngoại sinh gốc và panel đầy đủ **không đưa vào Git** vì SP500 có hạn chế phân phối lại; script tải và manifest/hash vẫn có trong repo. Tái lập phụ thuộc nguồn tiếp tục cung cấp cùng lịch sử: nếu nguồn sửa quá khứ hoặc hết cửa sổ lịch sử (FRED SP500 chỉ giữ 10 năm), pipeline dừng rõ ràng thay vì âm thầm nhận dữ liệu khác. Đây không phải cam kết archive tồn tại vĩnh viễn.
 

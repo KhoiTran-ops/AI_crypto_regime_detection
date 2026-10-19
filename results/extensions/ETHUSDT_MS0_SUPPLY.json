@@ -1,0 +1,223 @@
+{
+  "fingerprint": "02b05e6ac81edd4377866391095369972e81cbfdf8f1550aba4cad93e4b8f25d",
+  "decision": {
+    "covariates": null,
+    "train_first": "2018-02-16 00:00:00+00:00",
+    "validation_nonconverged": 0,
+    "validation_log_score": 2.1099137474230867
+  },
+  "diagnostics": [
+    {
+      "period": "2025-01-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-02-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-03-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-04-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-05-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-06-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-07-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-08-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-09-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-10-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-11-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2025-12-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2026-01-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2026-02-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2026-03-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2026-04-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2026-05-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2026-06-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2026-07-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2026-08-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    },
+    {
+      "period": "2026-09-01 00:00:00+00:00",
+      "converged": true,
+      "warnings": [],
+      "raw_high_vol_state": 1,
+      "raw_state_order": [
+        0,
+        1
+      ]
+    }
+  ],
+  "sha256": "7b39d7116b804ce3594480a83d3e1eae39a8ca5d236d928da0dee5f703b31b0d",
+  "normalization_maximum_mass_error": 6.661338147750939e-16
+}

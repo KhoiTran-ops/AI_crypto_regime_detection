@@ -4,6 +4,7 @@ import json
 import zipfile
 from concurrent.futures import ProcessPoolExecutor
 
+import numpy as np
 import pandas as pd
 
 from .data import ROOT, config, save_json
@@ -39,7 +40,27 @@ def _supply_worker(job):
     # Reuse the same matched-cohort estimator and artifact contract, with one additional covariate group.
     from .extensions import GROUPS, _worker
     GROUPS["SUPPLY"] = COVARIATES
-    return _worker(job)
+    asset, label = _worker(job)
+    # statsmodels may emit a probability one ULP above one. Normalize conditional
+    # weights before downstream strict long/cash accounting; density is unchanged.
+    maximum = 0.
+    for suffix in ("", "_validation"):
+        path = DEST / f"{asset}_{label}{suffix}.parquet"
+        prediction = pd.read_parquet(path)
+        columns = [column for column in prediction if column.startswith("p_") and column[2:].isdigit()]
+        weights = prediction[columns]
+        if not np.isfinite(weights).all().all() or (weights < 0).any().any() or (weights.sum(axis=1) <= 0).any():
+            raise ValueError("Invalid filtered conditional weights")
+        maximum = max(maximum, float((weights.sum(axis=1)-1).abs().max()))
+        prediction[columns] = weights.div(weights.sum(axis=1), axis=0)
+        prediction["p_high_vol"] = prediction[columns[-1]]
+        prediction.to_parquet(path)
+    receipt = DEST / f"{asset}_{label}.json"
+    record = json.loads(receipt.read_text(encoding="utf-8"))
+    record.update(normalization_maximum_mass_error=maximum,
+                  sha256=hashlib.sha256((DEST / f"{asset}_{label}.parquet").read_bytes()).hexdigest())
+    save_json(receipt, record)
+    return asset, label
 
 
 def run_supply():

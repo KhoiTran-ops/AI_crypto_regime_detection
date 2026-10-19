@@ -1,10 +1,12 @@
 """Supplemental evidence UI; numerical work stays in the offline pipeline."""
 import json
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+from scipy.special import softmax
 
 from .data import ROOT
 
@@ -14,7 +16,16 @@ def render_extensions(asset, chart):
     st.markdown("### Dữ liệu bổ sung và các đối chứng mới")
     st.caption("Phân tích hồi cứu. Giữ cách chia mẫu và ngưỡng RMSE của bản gốc; không chọn lại theo kết quả test.")
     coverage = pd.read_csv(folder / "source_coverage.csv")
-    st.dataframe(coverage, hide_index=True, width="stretch")
+    display = coverage.copy()
+    for column in ("first_date", "last_date"):
+        display[column] = pd.to_datetime(display[column], utc=True).dt.strftime("%Y-%m-%d")
+    display = display.rename(columns={"series": "Chuỗi", "first_date": "Bắt đầu", "last_date": "Đến",
+        "observations": "Số quan sát", "minimum": "Nhỏ nhất", "unit": "Đơn vị", "source": "Nguồn", "nonpositive": "Không dương"})
+    st.dataframe(display, hide_index=True, width="stretch")
+    supply_manifest = ROOT / "data/snapshots/supply_source.json"
+    if supply_manifest.exists():
+        count = json.loads(supply_manifest.read_text(encoding="utf-8"))["observations"]
+        st.caption(f"Bổ sung cung stablecoin theo mệnh giá: {count:,} quan sát; tách riêng vốn hóa theo giá thị trường.")
     st.caption("BTC/ETH price và volume dùng Binance. Coin Metrics chỉ bổ sung vốn hóa; DXY là chỉ số ICE qua Yahoo. "
                "Stablecoin/TVL theo phạm vi theo dõi của DefiLlama, không bảo đảm toàn bộ thị trường.")
     panel_path = folder / "external_panel.parquet"
@@ -56,12 +67,33 @@ def render_extensions(asset, chart):
     else:
         chart(px.scatter(prediction.reset_index(), x="date", y="state", color="noise",
                          labels={"state": "Cụm; -1 là noise", "date": "Ngày"}), 280)
+    details = json.loads((folder / f"{asset}_{model}.json").read_text(encoding="utf-8"))
+    if model == "MSGARCH":
+        parameters = []
+        for fit in details["diagnostics"]:
+            theta = np.asarray(fit["parameters"])
+            weights = softmax(np.column_stack([theta[2:4], theta[4:6], np.zeros(2)]), axis=1)
+            variance = np.exp(theta[:2]) * fit["scale"]**2
+            for state in range(2):
+                parameters.append({"Tháng": fit["period"][:10], "Trạng thái": state,
+                    "alpha": weights[state, 0], "beta": weights[state, 1],
+                    "omega": variance[state]*weights[state, 2],
+                    "Sigma dài hạn năm hóa": np.sqrt(365*variance[state]),
+                    "Xác suất ở lại": fit["transition"][state][state]})
+        st.dataframe(pd.DataFrame(parameters), hide_index=True, width="stretch")
+    elif model == "BOCPD":
+        st.caption(f"Hazard chọn từ validation: {details['decision']['hazard']:.5f}; "
+                   f"trọng số prior: {details['decision']['prior_weight']:.5g}.")
     coefficient = folder / f"{asset}_{model}_coefficients.csv"
     if coefficient.exists():
         st.markdown("**Hệ số chuyển trạng thái theo từng lần ước lượng**")
         details = json.loads((folder / f"{asset}_{model}.json").read_text(encoding="utf-8"))
         mapping = pd.DataFrame(details["diagnostics"])[["period", "raw_high_vol_state"]]
-        st.dataframe(pd.read_csv(coefficient).merge(mapping, on="period", validate="many_to_one"),
+        coefficients = pd.read_csv(coefficient)
+        covariates = ["Intercept", *(details["decision"].get("covariates") or [])]
+        coefficients["covariate"] = [covariates[int(name.split(".tvtp")[1])] if ".tvtp" in name else name
+                                     for name in coefficients.parameter]
+        st.dataframe(coefficients.merge(mapping, on="period", validate="many_to_one"),
                      hide_index=True, width="stretch")
         st.caption("Dấu hệ số phải đọc cùng trạng thái đích trong diagnostics; không diễn giải là tác động nhân quả.")
     performance = pd.read_csv(folder / "portfolio_performance.csv")
