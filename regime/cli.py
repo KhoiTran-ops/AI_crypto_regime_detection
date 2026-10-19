@@ -5,10 +5,13 @@ import argparse
 def _main():
     parser = argparse.ArgumentParser(description="Binance crypto regime research")
     parser.add_argument("command", choices=["data", "select", "adequacy", "evaluate", "intervals",
-                                            "publish", "verify", "reproduce", "external-data", "extend", "verify-extensions", "all"])
+                                            "publish", "verify", "reproduce", "report", "external-data", "extend", "verify-extensions", "all"])
     parser.add_argument("--refresh", action="store_true", help="Download external data only in a new snapshot checkout")
     parser.add_argument("--recompute", action="store_true", help="Rebuild extension data/summaries; valid model caches are retained")
     args = parser.parse_args()
+    if args.command == "report":
+        from .report import build_report
+        build_report()
     if args.command == "external-data":
         from .external import build_external
         from .supply import add_supply

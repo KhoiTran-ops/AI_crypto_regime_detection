@@ -6,3 +6,6 @@
 Dashboard đọc trực tiếp gói này. `python -m regime.cli verify-extensions` kiểm tra cả hai bộ kết quả và code/inputs đã khóa. Các lệnh tính nghiên cứu tự giải gói trước khi chạy, sau thành công tự đóng gói lại; không đổi công thức hay tham số. Cache dữ liệu ngoại sinh ở `extensions/*_features.parquet` và `external_panel.parquet` không vào Git.
 
 Ví dụ đọc dự báo: `from regime.results import Results; Results().frame("BTCUSDT_HMM.parquet")`. Với một mô hình bất kỳ dùng `store.frame(store.model_path("BTCUSDT", "TVTP_MACRO"))`.
+
+
+`tom_tat_ket_qua.html` là bản tổng hợp một file mở offline (bảng và 5 hình SVG nhúng). Tạo lại bằng `python -m regime.cli report`, không cần raw/cache hoặc fit lại. Bản này đọc kho đã chốt và không thay số liệu/cấu hình khoa học.

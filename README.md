@@ -2,6 +2,10 @@
 
 **Cập nhật 19/10/2026:** bổ sung FRED (VIX, Treasury, S&P500), ICE DXY qua Yahoo, Coin Metrics (vốn hóa), DefiLlama (stablecoin/TVL); giữ OHLCV/funding/OI Binance đã có. Thêm TVTP macro/crypto/liquidity/supply, HDBSCAN (cả chọn theo density), BOCPD và independent MS-GARCH. Chia mẫu và ngưỡng RMSE của bản gốc **chưa thay đổi** theo yêu cầu người dùng. Các mở rộng là phân tích hồi cứu, không có holdout mới untouched.
 
+## Bản tổng hợp nghiên cứu
+
+Mở [tom_tat_ket_qua.html](results/tom_tat_ket_qua.html): một file offline gồm bảng, 5 hình SVG, dữ liệu/biến/tham số, phương pháp và kết luận của toàn nghiên cứu. Có thể tải tại trang Dữ liệu. Tạo lại không cần raw hoặc fit mô hình: `python -m regime.cli report`. Nhãn R trên HMM chính BTC/ETH là mô tả theo hồ sơ đến 31.12.2024; [cơ sở chia mẫu và nhãn](docs/METHODOLOGY.md).
+
 ## Clone và mở kết quả
 
 Cần Python 3.12. Sau khi clone, chạy tại thư mục repo:

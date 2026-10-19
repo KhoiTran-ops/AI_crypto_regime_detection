@@ -15,3 +15,11 @@ Rủi ro: API thay đổi/schema, publication vintages thiếu, composition stab
 2. D02 — Menu trái 5 trang; thống nhất chọn tài sản/mô hình; biểu đồ điểm có mục tiêu rõ ràng, không trộn joint density khác biến hoặc gán mật độ cho clustering.
 3. D03 — Data gom thị trường, phái sinh, vĩ mô, on-chain và phương pháp. UI không có nhật ký, nhãn bổ sung hay phần giới hạn.
 4. D04 — Kiểm tra số liệu, toàn vẹn, tái lập clone, trình duyệt desktop/mobile; cập nhật README. Không fit lại, đổi mẫu, RMSE hoặc định nghĩa R.
+
+
+## Kết quả nghiên cứu thống nhất · 19.10.2026
+1. Đọc nguồn phương pháp và sự kiện kinh tế; phân biệt cơ sở thời gian với tính tối ưu ngày cắt.
+2. Dùng một hàm nhãn chung cho HMM chính; không gán ý nghĩa của HMM sang ID mô hình khác.
+3. Dựng HTML từ Results (không fit lại), hình SVG nhúng, bảng toàn bộ mô hình và danh mục.
+4. Verify hashes/summary, test hiện hữu và kiểm tra UI thật; cập nhật checkpoint và bàn giao.
+Chấp nhận: HTML mở offline, không phụ thuộc cache raw; số liệu khớp kho đã chốt; dashboard BTC/ETH có tên R.

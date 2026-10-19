@@ -50,3 +50,18 @@ Các tài liệu này hỗ trợ phương pháp, không cung cấp căn cứ má
 Ngưỡng 0,05 của recovery là RMSE toàn ma trận transition, không phải giới hạn sai số của từng p_ii. Không suy ngược từ việc qua ngưỡng trung bình sang việc từng persistence/duration đã đạt độ chính xác đó. Các khai báo trước là hồ sơ nội bộ có hash, không phải public preregistration.
 
 Sharpe/SD dùng toàn chuỗi net_return đã lưu, bao gồm giá trị ban đầu bằng 0 trên calendar chung; CAGR dùng số khoảng ngày len−1. Tái lập đã kiểm chứng trong môi trường Windows được khóa; không nhận là lần cài lạnh thứ hai hoặc bảo đảm kết quả byte-identical trên hệ khác.
+
+
+## Cơ sở chia mẫu · rà soát 19.10.2026
+
+**Có thể giải thích thiết kế hiện tại, chưa thể khẳng định tối ưu ngày cắt.**
+- Raw Binance bắt đầu 17.08.2017; ngày đầu không trọn vẹn bị loại. Mốc 17.10.2017 đồng bộ panel có rolling 60 ngày; riêng ba biến HMM không bắt buộc toàn bộ 60 ngày.
+- Train 17.10.2017–31.12.2022 có 1.902 ngày; validation 2023–2024 có 731; test 01.01.2025–30.09.2026 có 638. Đây là phân chia theo thời gian, không phải quy tắc 60/20/20. Mỗi origin chỉ dùng dữ liệu đã xảy ra, theo [Hyndman & Athanasopoulos, §5.10](https://otexts.com/fpp3/toolbox.html#time-series-cross-validation). [Cawley & Talbot (2010)](https://jmlr.org/papers/v11/cawley10a.html) giải thích sai lệch khi chọn và đánh giá mô hình trên cùng dữ liệu.
+- Về kinh tế, train bao trùm crypto winter khởi đầu tháng 11/2021 và suy giảm năm 2022 theo [ECB, 23.06.2023](https://www.ecb.europa.eu/press/key/date/2023/html/ecb.sp230623_1~80751450e6.en.html). Validation chứa thay đổi thể chế quan trọng: [SEC phê duyệt spot Bitcoin ETP ngày 10.01.2024](https://www.sec.gov/newsroom/speeches-statements/gensler-statement-spot-bitcoin-011023). Các sự kiện hỗ trợ tính đa dạng bối cảnh, **không suy ra** 31.12.2022 hoặc 31.12.2024 là điểm gãy hay mốc tối ưu. Chưa có chứng cứ các mốc được đăng ký công khai trước khi dữ liệu phát sinh.
+- Kiểm tra nested origins đã lưu: BTC chọn K=4,3,3,5,5 và ETH K=5,3,5,5,4 cho các năm outer 2020–2024. K nhạy theo thời kỳ; kiểm tra này không áp recovery gate giống hệt lựa chọn cuối nên không đọc như xác nhận BTC K=4/ETH K=5 ở mọi origin.
+- Sau chọn K, fit đầu test dùng train+validation (2.633 ngày đến 31.12.2024), rồi mở rộng mỗi tháng. Funding/OI và biến ngoại sinh có cohort riêng theo ngày khả dụng, không lấp quá khứ trước khi nguồn tồn tại. Các mở rộng đã xem test là phân tích hồi cứu.
+- Chọn BTC/ETH là phạm vi hai tài sản có lịch sử dài/liên tục ở Binance, không phải mẫu ngẫu nhiên đại diện toàn thị trường crypto. Ngày kết thúc là snapshot hoàn chỉnh 30.09.2026. Cỡ mẫu lịch không đồng nghĩa số quan sát độc lập; learning curve và recovery chưa chứng minh một cỡ mẫu tối thiểu phổ quát.
+
+## Nhãn thị trường HMM chính
+Nhãn hiển thị lấy từ hồ sơ đầu test đến 31.12.2024, dùng lợi suất trung bình và thứ bậc biến động tương đối theo từng tài sản. Không áp nhãn HMM cho mã R của mô hình khác. Nhãn BTC/ETH cùng R1/R2/R3 lần lượt: thiên tăng ít biến động, trung tính, thiên tăng biến động cao; BTC R4 và ETH R5 là biến động rất cao; ETH R4 thiên giảm biến động cao. Hồ sơ trọng số trong bảng khác với mean/sigma emission dùng cho bootstrap tham số. CI mean emission ETH R3/R4 chứa 0 nên nhãn hướng là mô tả, không phải kết luận dấu lợi suất có ý nghĩa thống kê. Hungarian giảm đảo mã, không bảo đảm ý nghĩa kinh tế bất biến sau mọi refit.
+Thuật ngữ tham khảo [Koki et al. (2022)](https://arxiv.org/html/2011.03741) và [Cortese et al. (2023)](https://link.springer.com/article/10.1007/s42521-023-00085-x); các tài liệu này không xác nhận trực tiếp nhãn của mô hình dự án.

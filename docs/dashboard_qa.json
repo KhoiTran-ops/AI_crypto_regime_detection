@@ -81,5 +81,37 @@
     "external_series_download_control": true,
     "working_tree_clean_after_commands": true,
     "dependencies": "Reused unchanged pinned environment; no second dependency install in this check"
+  },
+  "research_summary_2026_10_19": {
+    "status": "passed",
+    "primary_hmm_labels": {
+      "BTCUSDT": 4,
+      "ETHUSDT": 5
+    },
+    "unrelated_model_labels": "GMM real-browser; other models unit-tested",
+    "report": "results/tom_tat_ket_qua.html",
+    "html_sha256": "7e9438dc5cc1957b8ddf06533fa1c10ebe215d92ed6c226329cbefedd850f9e1",
+    "research_zip_sha256": "ba9cfd8f6205c3c66fc43e1ddfdd75cd9455b3723058539a84746fca86e0dc26",
+    "tables": 19,
+    "inline_svg_figures": 5,
+    "external_report_requests": 0,
+    "download_byte_exact": true,
+    "clean_rebuild_without_raw_cache": "final HTML byte-identical",
+    "browser": "Edge headless; 1440px desktop and 390px report; BTC/ETH labels and GMM isolation",
+    "tests": 16,
+    "new_tests": 1,
+    "scientific_artifacts_verified": 330,
+    "locked_extension_inputs_verified": 14,
+    "refit_performed": false,
+    "sample_or_rmse_changed": false,
+    "pdf_created": false,
+    "schedule": {
+      "trigger": "2026-10-19T18:00:00+07:00",
+      "last_exit_code": 1,
+      "reason": "Windows PowerShell parser: UTF-8 without BOM",
+      "script_encoding_corrected": true,
+      "parser_passed_after_fix": true,
+      "automatic_continuation_verified": false
+    }
   }
 }

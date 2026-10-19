@@ -63,3 +63,7 @@ Archive hồi cứu; không có ground-truth regime; Gaussian diagonal và rolli
 ## Nghiệm thu cuối
 
 Đã hoàn tất sản phẩm nghiên cứu và dashboard cục bộ; không còn lỗi kỹ thuật đang chặn. Working tree sẽ chốt sạch trong commit bàn giao. Chưa push/hosting. T01 về gắn folder trong UI và giới hạn historical vintages vẫn được ghi đúng phạm vi, không trình bày là đã xác minh.
+
+
+## Bản tổng hợp và nhãn · 19.10.2026
+Hoàn tất một HTML độc lập từ kho kết quả đã chốt: 19 bảng, 5 hình SVG nhúng; ba phần dữ liệu/biến/tham số, phương pháp, kết quả/kết luận. Cơ sở chia mẫu bổ sung tài liệu gốc Hyndman, Cawley–Talbot, ECB và SEC; phân biệt cơ sở phương pháp với ngày cắt thiết kế chưa tối ưu. Nhãn HMM chính đã hiển thị trên dashboard; không áp nhãn sang mô hình khác. Giữ nguyên mọi hash khoa học; kiểm tra 16 tests, lint, UI thực, download và rebuild không raw/cache. Không tạo PDF hay ước lượng lại. Lịch Windows 18:00 đã chạy nhưng exit1 do mã hóa script, sửa parser không đồng nghĩa đã xác nhận cơ chế continuation; người dùng yêu cầu tiếp tục trực tiếp.

@@ -25,3 +25,14 @@ def test_round_trip_dedup_and_corruption(tmp_path):
     with pytest.raises(ValueError, match="changed"):
         with materialized_results(tmp_path):
             pass
+
+
+def test_primary_regime_labels_do_not_leak_across_models():
+    from regime.labels import state_label
+
+    assert state_label("BTCUSDT", "HMM", 3) == "R4 · Biến động rất cao"
+    assert state_label("ETHUSDT", "HMM", 3) == "R4 · Thiên giảm, biến động cao"
+    assert state_label("ETHUSDT", "HMM", 4) == "R5 · Biến động rất cao"
+    for model in ("GMM", "HMM_return", "HMM_B", "TVTP_MACRO", "MSGARCH"):
+        assert state_label("BTCUSDT", model, 0) == "R1"
+    assert state_label("ETHUSDT", "HDBSCAN_DENSITY", -1) == "Noise"

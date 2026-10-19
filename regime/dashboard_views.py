@@ -9,6 +9,7 @@ import streamlit as st
 from scipy.special import softmax
 
 from .data import ROOT, config
+from .labels import LABEL_NOTE, state_label
 from .results import Results, materialized_results
 
 COLORS = ["#147d78", "#4263eb", "#c98a25", "#b85651", "#875db2", "#6b7280"]
@@ -74,7 +75,9 @@ def table(frame, formats=None):
               "volatility": "Biến động năm hóa", "max_drawdown": "Drawdown lớn nhất", "turnover": "Vòng quay",
               "ending_value": "Giá trị cuối kỳ", "block_days": "Độ dài block", "bootstrap_repetitions": "Lần bootstrap",
               "n_common": "Quan sát chung", "mean_difference": "Chênh lệch trung bình", "ci_low": "Cận dưới 95%",
-              "ci_high": "Cận trên 95%", "noise_fraction": "Tỷ lệ noise", "state_changes": "Lần đổi trạng thái"}
+              "ci_high": "Cận trên 95%", "noise_fraction": "Tỷ lệ noise", "state_changes": "Lần đổi trạng thái",
+              "regime": "Mã", "mean_return_daily": "Lợi suất ngày", "volatility_annual": "σ năm hóa",
+              "occupancy": "Tỷ lệ trọng số", "persistence": "P ở lại", "expected_duration_days": "Thời lượng kỳ vọng · ngày"}
     counts = ["Số quan sát", "test_days", "n_common", "complete_feature_days", "k", "block_days",
               "bootstrap_repetitions", "state_changes", "nonconverged_refits", "n_parameters"]
     formatting = {column: "{:,.0f}" for column in counts if column in frame}
@@ -93,12 +96,12 @@ def probabilities(value):
     return [c for c in value if re.fullmatch(r"p_\d+", c)]
 
 
-def signal_chart(value, model):
+def signal_chart(value, model, asset):
     cols = probabilities(value)
     if cols:
         fig = go.Figure()
         for i, col in enumerate(cols):
-            fig.add_trace(go.Scatter(x=value.index, y=value[col], name=f"R{i+1}", stackgroup="one",
+            fig.add_trace(go.Scatter(x=value.index, y=value[col], name=state_label(asset, model, i), stackgroup="one",
                                     line=dict(width=.5, color=COLORS[i % len(COLORS)])))
         fig.update_yaxes(range=[0, 1], tickformat=".0%", title_text={"KMeans": "Chỉ báo gán cụm", "GMM": "Xác suất thành phần"}.get(model, "Xác suất lọc"))
     elif "change_probability" in value:
@@ -109,7 +112,7 @@ def signal_chart(value, model):
         plotted["Cụm"] = plotted.state.map(lambda x: "Noise" if x == -1 else f"R{int(x)+1}")
         fig = px.scatter(plotted, x=plotted.index, y="membership_strength" if "membership_strength" in value else "state",
                          color="Cụm", color_discrete_sequence=COLORS, labels={"date": "Ngày UTC"})
-    chart(fig, 260)
+    chart(fig, 305 if model == "HMM" else 260)
 
 
 def overview(asset, model):
@@ -123,6 +126,8 @@ def overview(asset, model):
                   ("Biến động 30 ngày · năm hóa", f"{current.rv30:.1%}"),
                   ("Chỉ báo cụm σ cao nhất" if model == "KMeans" else "P(trạng thái σ cao nhất)",
                    f"{last.p_high_vol:.1%}" if "p_high_vol" in value else "—")])
+    if model == "HMM":
+        st.caption("Trạng thái hiện tại: " + state_label(asset, model, last.state))
     main, side = st.columns([2.25, 1])
     with main, st.container(border=True, key="card_price"):
         st.subheader("Giá và trạng thái thị trường")
@@ -135,10 +140,12 @@ def overview(asset, model):
             for i, state_id in enumerate(sorted(joined.state.unique())):
                 points = joined.loc[joined.state.eq(state_id)]
                 fig.add_trace(go.Scatter(x=points.index, y=points.close, mode="markers",
-                    name="Noise" if state_id == -1 else f"R{int(state_id)+1}",
+                    name=state_label(asset, model, state_id),
                     marker=dict(size=4, color=COLORS[i % len(COLORS)])))
         fig.update_yaxes(title_text="USDT")
-        chart(fig, 365)
+        chart(fig, 405 if model == "HMM" else 365)
+        if model == "HMM":
+            st.caption(LABEL_NOTE)
     with side, st.container(border=True, key="card_study"):
         st.subheader("Hồ sơ nghiên cứu")
         st.metric("Tài sản", asset.replace("USDT", " / USDT"))
@@ -148,7 +155,7 @@ def overview(asset, model):
         st.caption("Đơn vị thời gian: ngày UTC")
     with st.container(border=True, key="card_signal"):
         st.subheader("Phân bố trạng thái" if probabilities(value) else "Diễn biến tín hiệu")
-        signal_chart(visible, model)
+        signal_chart(visible, model, asset)
     left, right = st.columns(2)
     for column, title, field in ((left, "BTC / ETH · giá chuẩn hóa", "close"),
                                   (right, "BTC / ETH · tương quan 30 ngày", "correlation")):
@@ -212,7 +219,7 @@ def models(asset, model):
         st.download_button("Tải bảng điểm", scores.to_csv(index=False), file_name=f"{asset}_models.csv")
     with st.container(border=True, key="card_model_signal"):
         st.subheader("Tín hiệu · " + model)
-        signal_chart(value, model)
+        signal_chart(value, model, asset)
 
 
 def portfolio(asset, model):
@@ -254,7 +261,7 @@ def states(asset, model):
     diagnostics = record["diagnostics"] if isinstance(record, dict) else record
     with st.container(border=True, key="card_state_signal"):
         st.subheader("Xác suất và tín hiệu · " + model)
-        signal_chart(value, model)
+        signal_chart(value, model, asset)
     transitions = [d for d in diagnostics if "transition" in d]
     left, right = st.columns(2)
     if transitions:
@@ -271,10 +278,13 @@ def states(asset, model):
     with right if transitions else st.container(), st.container(border=True, key="card_regime_profile"):
         st.subheader("Đặc trưng trạng thái")
         if model == "HMM":
-            table(summary("regime_profiles").query("asset == @asset").drop(columns="asset"),
+            profiles = summary("regime_profiles").query("asset == @asset").drop(columns="asset").copy()
+            profiles.insert(1, "Nhãn thị trường", profiles.regime.map(
+                lambda code: state_label(asset, model, int(code[1:])-1).split(" · ", 1)[-1]))
+            table(profiles,
                   {"mean_return_daily": "{:.3%}", "volatility_annual": "{:.1%}", "occupancy": "{:.1%}",
                    "persistence": "{:.3f}", "expected_duration_days": "{:.1f}"})
-            st.caption("Đặc trưng của lần fit đầu kỳ đánh giá, từ dữ liệu đến 31.12.2024.")
+            st.caption(LABEL_NOTE)
         elif "state" in value:
             counts = value.state.value_counts(normalize=True).rename_axis("state").reset_index(name="Tỷ lệ quan sát")
             counts["state"] = counts.state.map(lambda v: "Noise" if v == -1 else f"R{int(v)+1}")
@@ -312,6 +322,9 @@ def states(asset, model):
 def data(asset, model):
     market = read_table(f"{asset}_market.parquet")
     sources = summary("data_sources")
+    report = ROOT / "results/tom_tat_ket_qua.html"
+    if report.exists():
+        st.download_button("Tải bản tổng hợp kết quả", report.read_bytes(), file_name=report.name, mime="text/html")
     grid_metrics([("Bắt đầu dữ liệu spot", "17.08.2017"), ("Chốt dữ liệu", "30.09.2026"),
                   ("Tài sản", "BTC / ETH"), ("Chuỗi vĩ mô / on-chain", str(sources.series.notna().sum()))])
     with st.container(border=True, key="card_data_explorer"):
