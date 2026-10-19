@@ -4,7 +4,7 @@
 
 ## Bản tổng hợp nghiên cứu
 
-Mở [tom_tat_ket_qua.html](results/tom_tat_ket_qua.html): một file offline gồm bảng, 5 hình SVG, dữ liệu/biến/tham số, phương pháp và kết luận của toàn nghiên cứu. Có thể tải tại trang Dữ liệu. Tạo lại không cần raw hoặc fit mô hình: `python -m regime.cli report`. Nhãn R trên HMM chính BTC/ETH là mô tả theo hồ sơ đến 31.12.2024; [cơ sở chia mẫu và nhãn](docs/METHODOLOGY.md).
+Mở [tom_tat_ket_qua.html](results/tom_tat_ket_qua.html): một file offline gồm bảng, 5 hình SVG, dữ liệu/biến/tham số, phương pháp và kết luận của toàn nghiên cứu. Có thể tải tại trang Dữ liệu. Tạo lại không cần raw hoặc fit mô hình: `python -m regime.cli report`. Thuật ngữ chuyên môn và nhãn regime dùng tiếng Anh; phần diễn giải bằng tiếng Việt. Nhãn R trên HMM chính BTC/ETH là mô tả theo hồ sơ đến 31.12.2024; [cơ sở chia mẫu và nhãn](docs/METHODOLOGY.md).
 
 ## Clone và mở kết quả
 

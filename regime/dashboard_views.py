@@ -13,12 +13,12 @@ from .labels import LABEL_NOTE, state_label
 from .results import Results, materialized_results
 
 COLORS = ["#147d78", "#4263eb", "#c98a25", "#b85651", "#875db2", "#6b7280"]
-STRATEGIES = {"buy_hold": "Mua và giữ", "vol_target": "Theo biến động", "regime_aware": "Theo trạng thái"}
-SERIES = {"close": "Giá đóng cửa · USDT", "quote_volume": "Khối lượng · USDT", "rv30": "Biến động 30 ngày · năm hóa",
+STRATEGIES = {"buy_hold": "Buy-and-hold", "vol_target": "Volatility targeting", "regime_aware": "Regime-aware"}
+SERIES = {"close": "Close price · USDT", "quote_volume": "Quote volume · USDT", "rv30": "30-day annualized volatility",
           "funding": "Funding · tổng ngày", "oi": "Open interest · đơn vị tài sản", "vix": "VIX", "dxy": "DXY",
-          "ust10": "Treasury 10 năm · %", "ust2": "Treasury 2 năm · %", "sp500": "S&P 500 · chỉ số giá",
-          "stablecoin_cap": "Vốn hóa stablecoin · USD", "stablecoin_supply": "Cung stablecoin · USD mệnh giá",
-          "defi_tvl": "DeFi TVL · USD", "btc_market_cap": "Vốn hóa BTC · USD", "eth_market_cap": "Vốn hóa ETH · USD"}
+          "ust10": "10-year Treasury yield · %", "ust2": "2-year Treasury yield · %", "sp500": "S&P 500 · price index",
+          "stablecoin_cap": "Stablecoin market cap · USD", "stablecoin_supply": "Stablecoin nominal supply · USD",
+          "defi_tvl": "DeFi TVL · USD", "btc_market_cap": "BTC market cap · USD", "eth_market_cap": "ETH market cap · USD"}
 
 
 def version():
@@ -57,7 +57,7 @@ def chart(fig, height=340):
     fig.update_layout(template="plotly_white", height=height, margin=dict(l=10, r=10, t=25, b=10),
                       font=dict(family="Segoe UI, Arial, sans-serif", size=12, color="#526175"),
                       paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", hovermode="x unified",
-                      colorway=COLORS, legend=dict(orientation="h", y=1.13, x=0),
+                      colorway=COLORS, legend=dict(orientation="h", y=1.02, yanchor="bottom", x=0),
                       xaxis=dict(gridcolor="#f0f2f5"), yaxis=dict(gridcolor="#edf0f4"))
     st.plotly_chart(fig, width="stretch", config={"displaylogo": False})
 
@@ -72,12 +72,12 @@ def table(frame, formats=None):
     labels = {"asset": "Tài sản", "model": "Mô hình", "first_date": "Từ ngày", "last_date": "Đến ngày",
               "test_days": "Ngày đánh giá", "cohort": "Nhóm biến", "split": "Tập mẫu", "start": "Từ ngày",
               "end": "Đến ngày", "complete_feature_days": "Quan sát hợp lệ", "strategy": "Chiến lược",
-              "volatility": "Biến động năm hóa", "max_drawdown": "Drawdown lớn nhất", "turnover": "Vòng quay",
-              "ending_value": "Giá trị cuối kỳ", "block_days": "Độ dài block", "bootstrap_repetitions": "Lần bootstrap",
-              "n_common": "Quan sát chung", "mean_difference": "Chênh lệch trung bình", "ci_low": "Cận dưới 95%",
-              "ci_high": "Cận trên 95%", "noise_fraction": "Tỷ lệ noise", "state_changes": "Lần đổi trạng thái",
-              "regime": "Mã", "mean_return_daily": "Lợi suất ngày", "volatility_annual": "σ năm hóa",
-              "occupancy": "Tỷ lệ trọng số", "persistence": "P ở lại", "expected_duration_days": "Thời lượng kỳ vọng · ngày"}
+              "volatility": "Annualized volatility", "max_drawdown": "Maximum drawdown", "turnover": "Turnover",
+              "ending_value": "Terminal portfolio value", "block_days": "Block length (days)", "bootstrap_repetitions": "Bootstrap replications",
+              "n_common": "Quan sát chung", "mean_difference": "Mean difference", "ci_low": "95% CI lower",
+              "ci_high": "95% CI upper", "noise_fraction": "Noise fraction", "state_changes": "State changes",
+              "regime": "Mã", "mean_return_daily": "Mean daily log return", "volatility_annual": "Annualized volatility",
+              "occupancy": "Posterior-weighted occupancy", "persistence": "Persistence", "expected_duration_days": "Expected duration (days)"}
     counts = ["Số quan sát", "test_days", "n_common", "complete_feature_days", "k", "block_days",
               "bootstrap_repetitions", "state_changes", "nonconverged_refits", "n_parameters"]
     formatting = {column: "{:,.0f}" for column in counts if column in frame}
@@ -103,15 +103,15 @@ def signal_chart(value, model, asset):
         for i, col in enumerate(cols):
             fig.add_trace(go.Scatter(x=value.index, y=value[col], name=state_label(asset, model, i), stackgroup="one",
                                     line=dict(width=.5, color=COLORS[i % len(COLORS)])))
-        fig.update_yaxes(range=[0, 1], tickformat=".0%", title_text={"KMeans": "Chỉ báo gán cụm", "GMM": "Xác suất thành phần"}.get(model, "Xác suất lọc"))
+        fig.update_yaxes(range=[0, 1], tickformat=".0%", title_text={"KMeans": "Cluster assignment indicator", "GMM": "Component probability"}.get(model, "Filtered probability"))
     elif "change_probability" in value:
         fig = px.line(value, x=value.index, y="change_probability",
-                      labels={"change_probability": "Xác suất điểm thay đổi", "date": "Ngày UTC"})
+                      labels={"change_probability": "Change-point probability", "date": "Ngày UTC"})
     else:
         plotted = value.copy()
-        plotted["Cụm"] = plotted.state.map(lambda x: "Noise" if x == -1 else f"R{int(x)+1}")
+        plotted["Cluster"] = plotted.state.map(lambda x: "Noise" if x == -1 else f"R{int(x)+1}")
         fig = px.scatter(plotted, x=plotted.index, y="membership_strength" if "membership_strength" in value else "state",
-                         color="Cụm", color_discrete_sequence=COLORS, labels={"date": "Ngày UTC"})
+                         color="Cluster", color_discrete_sequence=COLORS, labels={"date": "Ngày UTC"})
     chart(fig, 305 if model == "HMM" else 260)
 
 
@@ -122,20 +122,20 @@ def overview(asset, model):
     state = f"R{int(last.state)+1}" if "state" in value and last.state >= 0 else "—"
     if "noise" in value and last.noise:
         state = "Noise"
-    grid_metrics([("Giá đóng cửa · USDT", f"{current.close:,.2f}"), ("Trạng thái · " + model, state),
-                  ("Biến động 30 ngày · năm hóa", f"{current.rv30:.1%}"),
-                  ("Chỉ báo cụm σ cao nhất" if model == "KMeans" else "P(trạng thái σ cao nhất)",
+    grid_metrics([("Close price · USDT", f"{current.close:,.2f}"), ("Market regime · " + model, state),
+                  ("30-day annualized volatility", f"{current.rv30:.1%}"),
+                  ("Highest-volatility cluster indicator" if model == "KMeans" else "P(highest-volatility state)",
                    f"{last.p_high_vol:.1%}" if "p_high_vol" in value else "—")])
     if model == "HMM":
         st.caption("Trạng thái hiện tại: " + state_label(asset, model, last.state))
     main, side = st.columns([2.25, 1])
     with main, st.container(border=True, key="card_price"):
-        st.subheader("Giá và trạng thái thị trường")
+        st.subheader("Price and market regimes")
         selected = st.date_input("Khoảng hiển thị", (value.index[0].date(), value.index[-1].date()),
                                  min_value=value.index[0].date(), max_value=value.index[-1].date())
         visible = value.loc[str(selected[0]):str(selected[-1])] if len(selected) == 2 else value
         joined = visible.join(market[["close"]])
-        fig = go.Figure(go.Scatter(x=joined.index, y=joined.close, name="Giá", line=dict(color="#26364b", width=1.4)))
+        fig = go.Figure(go.Scatter(x=joined.index, y=joined.close, name="Close price", line=dict(color="#26364b", width=1.4)))
         if "state" in joined:
             for i, state_id in enumerate(sorted(joined.state.unique())):
                 points = joined.loc[joined.state.eq(state_id)]
@@ -154,11 +154,11 @@ def overview(asset, model):
         st.caption(f"{value.index[0]:%d.%m.%Y} — {value.index[-1]:%d.%m.%Y}")
         st.caption("Đơn vị thời gian: ngày UTC")
     with st.container(border=True, key="card_signal"):
-        st.subheader("Phân bố trạng thái" if probabilities(value) else "Diễn biến tín hiệu")
+        st.subheader("Regime probabilities" if probabilities(value) else "Diễn biến tín hiệu")
         signal_chart(visible, model, asset)
     left, right = st.columns(2)
-    for column, title, field in ((left, "BTC / ETH · giá chuẩn hóa", "close"),
-                                  (right, "BTC / ETH · tương quan 30 ngày", "correlation")):
+    for column, title, field in ((left, "BTC / ETH · normalized prices", "close"),
+                                  (right, "BTC / ETH · 30-day correlation", "correlation")):
         with column, st.container(border=True, key="card_compare_" + field):
             st.subheader(title)
             frames = {a: read_table(f"{a}_market.parquet") for a in ("BTCUSDT", "ETHUSDT")}
@@ -169,7 +169,7 @@ def overview(asset, model):
                     fig.add_trace(go.Scatter(x=prices.index, y=100*prices/prices.iloc[0], name=a[:3]))
             else:
                 corr = frames["BTCUSDT"]["return"].rolling(30).corr(frames["ETHUSDT"]["return"]).loc[value.index]
-                fig = go.Figure(go.Scatter(x=corr.index, y=corr, name="Tương quan", line_color=COLORS[0]))
+                fig = go.Figure(go.Scatter(x=corr.index, y=corr, name="Correlation", line_color=COLORS[0]))
                 fig.update_yaxes(range=[-1, 1])
             chart(fig, 250)
 
@@ -180,34 +180,34 @@ def models(asset, model):
     selected = scores.loc[scores.model.eq(model)].iloc[0]
     grid_metrics([("Cấu hình", str(len(scores))), ("Quan sát", str(len(value))),
                   ("Log score · return", f"{selected.mean_return_log_score:.4f}" if pd.notna(selected.mean_return_log_score) else "—"),
-                  ("Số lần fit chưa hội tụ", str(int(selected.nonconverged_refits)))])
+                  ("Non-converged refits", str(int(selected.nonconverged_refits)))])
     with st.container(border=True, key="card_model_scores"):
         st.subheader("Đánh giá mô hình")
-        target = st.selectbox("Chỉ tiêu", ["Mật độ return", "Mật độ đa biến · nhóm lõi", "Phân cụm"])
-        if target == "Phân cụm":
+        target = st.selectbox("Chỉ tiêu", ["Return density", "Joint density · core features", "Clustering"])
+        if target == "Clustering":
             selected_models = scores[scores.model.str.startswith(("HDBSCAN", "KMeans"))]
             table(selected_models.reindex(columns=["model", "test_days", "state_changes", "noise_fraction", "mean_membership_strength"]),
                   {"noise_fraction": "{:.1%}", "mean_membership_strength": "{:.3f}"})
         else:
-            metric = "mean_return_log_score" if target == "Mật độ return" else "mean_log_score"
+            metric = "mean_return_log_score" if target == "Return density" else "mean_log_score"
             comparable = scores.dropna(subset=[metric])
-            if target != "Mật độ return":
+            if target != "Return density":
                 comparable = comparable.loc[comparable.score_group.eq("joint_core")]
             comparable = comparable.sort_values(metric)
             fig = px.bar(comparable, x=metric, y="model", orientation="h", color="model",
                          color_discrete_sequence=COLORS, text=metric,
-                         labels={metric: "Log density trung bình", "model": ""})
+                         labels={metric: "Mean log density", "model": ""})
             fig.update_traces(texttemplate="%{x:.4f}", textposition="outside")
             fig.update_layout(showlegend=False, hovermode="closest")
             chart(fig, max(270, len(comparable)*28+65))
-        st.caption("Log score càng cao càng tốt. Mật độ đa biến nhóm lõi: return, biến động và khối lượng tương đối.")
+        st.caption("Log score càng cao càng tốt. Core joint density dùng log return, realized volatility và relative volume.")
     with st.container(border=True, key="card_score_comparisons"):
-        st.subheader("Chênh lệch điểm và khoảng tin cậy 95%")
+        st.subheader("Score differences and 95% confidence intervals")
         comparison = summary("score_comparisons").query("asset == @asset").copy()
         comparison["left"] = comparison.left.fillna(comparison.model)
         comparison["right"] = comparison.right.fillna(comparison.reference)
         comparison["Chỉ tiêu"] = np.where(comparison.left.eq("HMM") & comparison.right.eq("GMM"),
-                                           "Joint · nhóm lõi", "Return")
+                                           "Joint · core features", "Return")
         table(comparison[["Chỉ tiêu", "left", "right", "n_common", "mean_difference", "ci_low", "ci_high"]],
               {"mean_difference": "{:.5f}", "ci_low": "{:.5f}", "ci_high": "{:.5f}"})
     with st.expander("Lựa chọn số trạng thái"):
@@ -224,19 +224,19 @@ def models(asset, model):
 
 def portfolio(asset, model):
     performance = summary("portfolio_performance").query("asset == @asset and model == @model")
-    cost = st.segmented_control("Chi phí giao dịch · bps", [5, 10, 25], default=10)
+    cost = st.segmented_control("Transaction costs · bps", [5, 10, 25], default=10)
     cost = 10 if cost is None else cost
     view = performance.loc[performance.cost_bps.eq(cost)].copy()
     active = view.loc[view.strategy.eq("regime_aware")].iloc[0]
-    grid_metrics([("CAGR · theo trạng thái", f"{active.cagr:.1%}"), ("Sharpe", f"{active.sharpe:.2f}"),
-                  ("Drawdown lớn nhất", f"{active.max_drawdown:.1%}"), ("Tỷ trọng trung bình", f"{active.average_exposure:.1%}")])
+    grid_metrics([("CAGR · regime-aware", f"{active.cagr:.1%}"), ("Sharpe", f"{active.sharpe:.2f}"),
+                  ("Maximum drawdown", f"{active.max_drawdown:.1%}"), ("Average exposure", f"{active.average_exposure:.1%}")])
     _, base = prediction(asset, model)
     equity, drawdown = go.Figure(), go.Figure()
     for strategy, label in STRATEGIES.items():
         path = read_table(base + f"_{strategy}_portfolio.parquet")
         equity.add_trace(go.Scatter(x=path.index, y=path.equity, name=label))
         drawdown.add_trace(go.Scatter(x=path.index, y=path.drawdown, name=label))
-    for title, fig in (("Giá trị danh mục · 10 bps", equity), ("Drawdown · 10 bps", drawdown)):
+    for title, fig in (("Portfolio value · 10 bps", equity), ("Drawdown · 10 bps", drawdown)):
         with st.container(border=True, key="card_portfolio_" + title):
             st.subheader(title)
             if fig is drawdown:
@@ -260,7 +260,7 @@ def states(asset, model):
     record = read_json(path)
     diagnostics = record["diagnostics"] if isinstance(record, dict) else record
     with st.container(border=True, key="card_state_signal"):
-        st.subheader("Xác suất và tín hiệu · " + model)
+        st.subheader("Probabilities and signals · " + model)
         signal_chart(value, model, asset)
     transitions = [d for d in diagnostics if "transition" in d]
     left, right = st.columns(2)
@@ -269,32 +269,32 @@ def states(asset, model):
         matrix = np.asarray(latest["transition"])
         labels = [f"R{i+1}" for i in range(len(matrix))]
         if model == "MSGARCH":
-            labels = [f"S{i+1} thô" for i in range(len(matrix))]
+            labels = [f"S{i+1} raw" for i in range(len(matrix))]
         with left, st.container(border=True, key="card_transition"):
-            st.subheader("Ma trận chuyển trạng thái")
+            st.subheader("Transition matrix")
             chart(px.imshow(matrix, x=labels, y=labels, text_auto=".2f", zmin=0, zmax=1,
                             color_continuous_scale=["#f1f7f6", "#147d78"],
-                            labels={"x": "Ngày kế tiếp", "y": "Ngày hiện tại", "color": "Xác suất"}), 325)
+                            labels={"x": "Next day", "y": "Current day", "color": "Probability"}), 325)
     with right if transitions else st.container(), st.container(border=True, key="card_regime_profile"):
-        st.subheader("Đặc trưng trạng thái")
+        st.subheader("Regime profiles")
         if model == "HMM":
             profiles = summary("regime_profiles").query("asset == @asset").drop(columns="asset").copy()
-            profiles.insert(1, "Nhãn thị trường", profiles.regime.map(
+            profiles.insert(1, "Market regime", profiles.regime.map(
                 lambda code: state_label(asset, model, int(code[1:])-1).split(" · ", 1)[-1]))
             table(profiles,
                   {"mean_return_daily": "{:.3%}", "volatility_annual": "{:.1%}", "occupancy": "{:.1%}",
                    "persistence": "{:.3f}", "expected_duration_days": "{:.1f}"})
             st.caption(LABEL_NOTE)
         elif "state" in value:
-            counts = value.state.value_counts(normalize=True).rename_axis("state").reset_index(name="Tỷ lệ quan sát")
+            counts = value.state.value_counts(normalize=True).rename_axis("state").reset_index(name="Observation share")
             counts["state"] = counts.state.map(lambda v: "Noise" if v == -1 else f"R{int(v)+1}")
-            table(counts, {"Tỷ lệ quan sát": "{:.1%}"})
+            table(counts, {"Observation share": "{:.1%}"})
         elif model == "BOCPD":
             table(pd.DataFrame([record["decision"]]))
     coefficient_path = base + ("_coefficients.csv" if base.startswith("extensions/") else ".coefficients.csv")
     if store.exists(coefficient_path):
         with st.container(border=True, key="card_coefficients"):
-            st.subheader("Hệ số mô hình")
+            st.subheader("Model coefficients")
             coefficients = read_table(coefficient_path)
             if isinstance(record, dict):
                 covariates = ["Intercept", *(record["decision"].get("covariates") or [])]
@@ -311,11 +311,11 @@ def states(asset, model):
             weights = softmax(np.column_stack([theta[2:4], theta[4:6], np.zeros(2)]), axis=1)
             variance = np.exp(theta[:2])*fit["scale"]**2
             for state_id in range(2):
-                rows.append({"Tháng": fit["period"][:10], "Trạng thái thô": f"S{state_id+1}",
+                rows.append({"Tháng": fit["period"][:10], "Raw state": f"S{state_id+1}",
                     "alpha": weights[state_id, 0], "beta": weights[state_id, 1],
-                    "omega": variance[state_id]*weights[state_id, 2], "Sigma năm hóa": np.sqrt(365*variance[state_id])})
+                    "omega": variance[state_id]*weights[state_id, 2], "Annualized sigma": np.sqrt(365*variance[state_id])})
         with st.container(border=True, key="card_garch_parameters"):
-            st.subheader("Tham số GARCH")
+            st.subheader("GARCH parameters")
             table(pd.DataFrame(rows))
 
 
@@ -359,16 +359,16 @@ def data(asset, model):
     with st.container(border=True, key="card_methods"):
         st.subheader("Phương pháp nghiên cứu")
         cfg = config()
-        st.markdown(f"Dữ liệu ngày UTC; lợi suất log, biến động lăn, khối lượng tương đối, thanh khoản, "
+        st.markdown(f"Dữ liệu ngày UTC; log return, rolling volatility, relative volume, liquidity, "
                     f"funding/OI và các biến vĩ mô/on-chain. Train đến **{cfg['train_end']}**; "
                     f"validation **{cfg['validation_start']} – {cfg['validation_end']}**; "
                     f"đánh giá **{cfg['test_start']} – {cfg['test_end']}**.")
         st.markdown("Mô hình gồm HMM, GMM, K-means, Markov switching, TVTP, MS-GARCH, BOCPD và HDBSCAN. "
-                    "Các mô hình tái ước lượng dùng cửa sổ mở rộng theo tháng; BOCPD cập nhật tuần tự. "
-                    "Mật độ dự báo được tính trước khi quan sát ngày cần dự báo.")
-        st.markdown("Danh mục mua/giữ, điều chỉnh biến động và điều chỉnh theo trạng thái; mục tiêu biến động 40%/năm, "
-                    "tỷ trọng 0–100%, lãi tiền mặt 0. Tín hiệu cuối ngày t giao dịch ở open t+2. "
-                    "Chi phí 5/10/25 bps; bootstrap block 30 ngày, 1.000 lần để tính khoảng tin cậy 95%.")
+                    "Các mô hình tái ước lượng dùng expanding window theo tháng; BOCPD cập nhật tuần tự. "
+                    "Predictive density được tính trước khi quan sát ngày cần dự báo.")
+        st.markdown("Danh mục Buy-and-hold, Volatility targeting và Regime-aware; volatility target 40%/năm, "
+                    "exposure 0–100%, lãi tiền mặt 0. Tín hiệu cuối ngày t giao dịch ở open t+2. "
+                    "Chi phí 5/10/25 bps; bootstrap block 30 ngày, 1.000 lần để tính 95% confidence intervals.")
 
 
 PAGES = {"Tổng quan": (":material/space_dashboard:", overview), "Mô hình": (":material/analytics:", models),

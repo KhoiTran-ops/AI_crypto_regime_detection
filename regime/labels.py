@@ -1,11 +1,12 @@
 """Economic descriptions of the primary HMM initial-fit profiles only."""
 STATE_NAMES = {
-    "BTCUSDT": ("Thiên tăng, ít biến động", "Trung tính", "Thiên tăng, biến động cao", "Biến động rất cao"),
-    "ETHUSDT": ("Thiên tăng, ít biến động", "Trung tính", "Thiên tăng, biến động cao",
-                "Thiên giảm, biến động cao", "Biến động rất cao"),
+    "BTCUSDT": ("Bullish regime — low volatility", "Neutral market regime",
+                "Bullish regime — high volatility", "High-volatility regime"),
+    "ETHUSDT": ("Bullish regime — low volatility", "Neutral market regime", "Bullish regime — high volatility",
+                "Bearish regime — high volatility", "High-volatility regime"),
 }
 LABEL_NOTE = ("Nhãn diễn giải theo hồ sơ HMM đến 31.12.2024; mã R được ghép qua các lần fit tháng. "
-              "Mức biến động tương đối trong từng tài sản; thiên tăng/giảm mô tả hướng lợi suất trung bình.")
+              "Volatility được so tương đối trong từng tài sản; Bullish/Bearish mô tả hướng mean return.")
 
 
 def state_label(asset, model, state):

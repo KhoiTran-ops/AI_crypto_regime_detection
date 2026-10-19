@@ -90,7 +90,7 @@
     },
     "unrelated_model_labels": "GMM real-browser; other models unit-tested",
     "report": "results/tom_tat_ket_qua.html",
-    "html_sha256": "67f810747eb121be01ebc51015e79010960497efd9c130ee2b6a783acd67ec26",
+    "html_sha256": "697dec6c23727259b3e140e68586d067576fe43c27edcde7584e8452d3815ac2",
     "research_zip_sha256": "ba9cfd8f6205c3c66fc43e1ddfdd75cd9455b3723058539a84746fca86e0dc26",
     "tables": 19,
     "inline_svg_figures": 5,
@@ -112,6 +112,8 @@
       "script_encoding_corrected": true,
       "parser_passed_after_fix": true,
       "automatic_continuation_verified": false
-    }
+    },
+    "terminology": "English technical terms and market-regime labels; Vietnamese explanatory prose",
+    "english_terminology_qa": "BTC/ETH real-browser labels and desktop legends; 19 HTML tables/5 SVGs; report 390px width; zero browser errors"
   }
 }

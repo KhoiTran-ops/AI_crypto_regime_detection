@@ -63,5 +63,11 @@ Sharpe/SD dùng toàn chuỗi net_return đã lưu, bao gồm giá trị ban đ�
 - Chọn BTC/ETH là phạm vi hai tài sản có lịch sử dài/liên tục ở Binance, không phải mẫu ngẫu nhiên đại diện toàn thị trường crypto. Ngày kết thúc là snapshot hoàn chỉnh 30.09.2026. Cỡ mẫu lịch không đồng nghĩa số quan sát độc lập; learning curve và recovery chưa chứng minh một cỡ mẫu tối thiểu phổ quát.
 
 ## Nhãn thị trường HMM chính
-Nhãn hiển thị lấy từ hồ sơ đầu test đến 31.12.2024, dùng lợi suất trung bình và thứ bậc biến động tương đối theo từng tài sản. Không áp nhãn HMM cho mã R của mô hình khác. Nhãn BTC/ETH cùng R1/R2/R3 lần lượt: thiên tăng ít biến động, trung tính, thiên tăng biến động cao; BTC R4 và ETH R5 là biến động rất cao; ETH R4 thiên giảm biến động cao. Hồ sơ trọng số trong bảng khác với mean/sigma emission dùng cho bootstrap tham số. CI mean emission ETH R3/R4 chứa 0 nên nhãn hướng là mô tả, không phải kết luận dấu lợi suất có ý nghĩa thống kê. Hungarian giảm đảo mã, không bảo đảm ý nghĩa kinh tế bất biến sau mọi refit.
+Nhãn tiếng Anh dùng thống nhất trên dashboard và bản tổng hợp:
+- BTC R1 / ETH R1: **Bullish regime — low volatility**.
+- BTC R2 / ETH R2: **Neutral market regime**.
+- BTC R3 / ETH R3: **Bullish regime — high volatility**.
+- BTC R4 / ETH R5: **High-volatility regime**.
+- ETH R4: **Bearish regime — high volatility**.
+Nhãn lấy từ hồ sơ đầu test đến 31.12.2024, dựa trên mean return và relative volatility theo từng tài sản. Không áp nhãn HMM cho mã R của mô hình khác. Posterior-weighted profiles khác với emission parameters dùng cho bootstrap. CI của mean emission ETH R3/R4 chứa 0 nên Bullish/Bearish mang nghĩa mô tả, không khẳng định dấu return có ý nghĩa thống kê. Hungarian matching giảm đảo mã, không bảo đảm ý nghĩa kinh tế bất biến sau mọi refit.
 Thuật ngữ tham khảo [Koki et al. (2022)](https://arxiv.org/html/2011.03741) và [Cortese et al. (2023)](https://link.springer.com/article/10.1007/s42521-023-00085-x); các tài liệu này không xác nhận trực tiếp nhãn của mô hình dự án.
