@@ -8,7 +8,11 @@ def _main():
                                             "publish", "verify", "reproduce", "report", "external-data", "extend", "verify-extensions", "all"])
     parser.add_argument("--refresh", action="store_true", help="Download external data only in a new snapshot checkout")
     parser.add_argument("--recompute", action="store_true", help="Rebuild extension data/summaries; valid model caches are retained")
+    parser.add_argument("--include-publications", action="store_true",
+                        help="Require publication export hashes as well when running verify")
     args = parser.parse_args()
+    if args.include_publications and args.command != "verify":
+        parser.error("--include-publications is only valid with verify")
     if args.command == "report":
         from .report import build_report
         build_report()
@@ -74,7 +78,7 @@ def _main():
         publish()
     if args.command == "verify":
         from .reproduce import verify
-        verify()
+        verify(include_publications=args.include_publications)
     if args.command == "reproduce":
         from .reproduce import reproduce
         reproduce()

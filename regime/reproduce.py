@@ -17,11 +17,15 @@ def published_bytes(path):
     return Results().read(relative[len("results/"):]) if relative.startswith("results/") else path.read_bytes()
 
 
-def verify():
+def verify(include_publications=False):
+    """Check runtime artifacts; explicitly opt in to optional publication exports."""
     from .results import verify_results
     verify_results()
     manifest = json.loads(published_bytes(ROOT / "results/artifact_hashes.json"))
-    changed = [name for name, expected in manifest.items()
+    # Publication exports are optional in source checkouts; model artifacts remain mandatory.
+    required = {name: expected for name, expected in manifest.items()
+                if include_publications or not name.startswith("paper/")}
+    changed = [name for name, expected in required.items()
                if hashlib.sha256(published_bytes(ROOT / name)).hexdigest() != expected]
     if changed:
         raise ValueError(f"Published artifacts changed: {changed}")
@@ -38,7 +42,8 @@ def verify():
         if (hashlib.sha256(baseline).hexdigest() != lock["requirements_hash"]
                 or current_pins != original_pins | {"hdbscan==0.8.44"}):
             raise ValueError("Baseline dependency pins changed beyond the declared HDBSCAN extension")
-    print(f"Verified {len(manifest)} artifact hashes and all locked scientific source files", flush=True)
+    print(f"Verified {len(required)} {'runtime/publication' if include_publications else 'runtime'} artifact hashes "
+          "and all locked scientific source files", flush=True)
 
 
 def reproduce():

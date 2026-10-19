@@ -1,40 +1,51 @@
+# Local environments, caches and secrets.
 .venv/
 .tools/
 __pycache__/
 .pytest_cache/
+.pytest-tmp/
 .ruff_cache/
 *.egg-info/
-data/raw/
-data/processed/
-outputs/runs/
 .env
 .env.*
 !.env.example
 *.log
-
-outputs/pilot_absolute_volume/
-outputs/research/*
-!outputs/research/selection.json
-!outputs/research/benchmark_selection.json
-!outputs/research/cohort_selection.json
-!outputs/research/adequacy/
-outputs/research/adequacy/*
-!outputs/research/adequacy/protocol.json
-!outputs/research/adequacy/decisions.json
-
-outputs/prior_runs/
-
-# Third-party observations are downloaded locally; Git stores hashes and aggregate findings.
-data/snapshots/external_raw.zip
-data/snapshots/external_observations.parquet
-outputs/external_download.json
-results/extensions/external_panel.parquet
-results/extensions/*_features.parquet
-
-.pytest-tmp/
-
-# Local packaging and operating-system files.
 build/
 dist/
 .DS_Store
 Thumbs.db
+
+# Documentation and publication outputs remain local.
+*.md
+!/README.md
+/CAPABILITY_MAP.md
+/tasks/
+/paper/
+/docs/*
+!/docs/extension_baseline_hashes.json
+!/docs/history/
+/docs/history/*
+!/docs/history/requirements_baseline.lock
+
+# Keep only source manifests/calibration consumed by the pipeline.
+/data/*
+!/data/snapshots/
+/data/snapshots/*
+!/data/snapshots/extension_calibration.json
+!/data/snapshots/external_sources.json
+!/data/snapshots/supply_source.json
+
+# Keep cached model-selection inputs; generated audits stay local.
+/outputs/*
+!/outputs/research/
+/outputs/research/*
+!/outputs/research/selection.json
+!/outputs/research/benchmark_selection.json
+!/outputs/research/cohort_selection.json
+
+# Runtime findings used by the dashboard; rendered reports stay local.
+/results/*
+!/results/research.zip
+!/results/tables/
+/results/tables/*
+!/results/tables/*.csv
