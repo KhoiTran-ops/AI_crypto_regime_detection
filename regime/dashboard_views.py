@@ -68,7 +68,20 @@ def grid_metrics(items):
 
 
 def table(frame, formats=None):
-    st.dataframe(frame.style.format(formats or {}, na_rep="—"), hide_index=True, width="stretch")
+    labels = {"asset": "Tài sản", "model": "Mô hình", "first_date": "Từ ngày", "last_date": "Đến ngày",
+              "test_days": "Ngày đánh giá", "cohort": "Nhóm biến", "split": "Tập mẫu", "start": "Từ ngày",
+              "end": "Đến ngày", "complete_feature_days": "Quan sát hợp lệ", "strategy": "Chiến lược",
+              "volatility": "Biến động năm hóa", "max_drawdown": "Drawdown lớn nhất", "turnover": "Vòng quay",
+              "ending_value": "Giá trị cuối kỳ", "block_days": "Độ dài block", "bootstrap_repetitions": "Lần bootstrap",
+              "n_common": "Quan sát chung", "mean_difference": "Chênh lệch trung bình", "ci_low": "Cận dưới 95%",
+              "ci_high": "Cận trên 95%", "noise_fraction": "Tỷ lệ noise", "state_changes": "Lần đổi trạng thái"}
+    counts = ["Số quan sát", "test_days", "n_common", "complete_feature_days", "k", "block_days",
+              "bootstrap_repetitions", "state_changes", "nonconverged_refits", "n_parameters"]
+    formatting = {column: "{:,.0f}" for column in counts if column in frame}
+    formatting.update(formats or {})
+    formatting = {labels.get(column, column): value for column, value in formatting.items()}
+    st.dataframe(frame.rename(columns=labels).style.format(formatting, na_rep="—"),
+                 hide_index=True, width="stretch")
 
 
 def prediction(asset, model):
