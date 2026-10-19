@@ -14,7 +14,7 @@ py -3.12 -m venv .venv
 
 Linux/macOS: `python3.12 -m venv .venv`, `.venv/bin/python -m pip install -r requirements.lock`, `.venv/bin/python -m streamlit run dashboard.py`.
 
-Dashboard mở được bảng kết quả gốc và mở rộng từ các artifact trong Git, không cần raw/cache từ máy tác giả. Muốn xem chuỗi ngoại sinh, bấm **Tải dữ liệu bổ sung** trong tab mở rộng hoặc chạy:
+Dashboard trình bày toàn nghiên cứu qua 5 trang: Tổng quan, Mô hình, Danh mục, Trạng thái, Dữ liệu. Đọc kết quả ngay từ Git, không cần raw/cache trên máy tác giả. Trang Mô hình chọn mật độ return, mật độ đa biến hoặc phân cụm; biểu đồ mặc định có mọi mô hình đã tính return log score. Muốn xem chuỗi ngoại sinh, bấm **Tải chuỗi dữ liệu** trong trang Dữ liệu hoặc chạy:
 
 ```powershell
 .\.venv\Scripts\python.exe -m regime.cli external-data
@@ -25,7 +25,7 @@ Lệnh thứ nhất tải bổ sung miễn phí, không cần API key, chuẩn h
 
 Dữ liệu ngoại sinh gốc và panel đầy đủ **không đưa vào Git** vì SP500 có hạn chế phân phối lại; script tải và manifest/hash vẫn có trong repo. Tái lập phụ thuộc nguồn tiếp tục cung cấp cùng lịch sử: nếu nguồn sửa quá khứ hoặc hết cửa sổ lịch sử (FRED SP500 chỉ giữ 10 năm), pipeline dừng rõ ràng thay vì âm thầm nhận dữ liệu khác. Đây không phải cam kết archive tồn tại vĩnh viễn.
 
-Kết quả: `results/extensions/model_scores.csv`, `score_comparisons.csv`, `portfolio_performance.csv`, `sample_counts.csv`, `liquidity_profiles.csv`, prediction/coefficients/diagnostics theo mô hình. Cơ sở và giả định: [EXTERNAL_METHODS](docs/EXTERNAL_METHODS.md). Spec: [CAPABILITY_MAP](CAPABILITY_MAP.md); plan: [tasks/plan.md](tasks/plan.md), trạng thái: [tasks/todo.md](tasks/todo.md).
+Kết quả: **7 bảng CSV chung trong `results/tables/`**; dự báo, hệ số, chẩn đoán và đường danh mục trong **`results/research.zip`**. Giữ nguyên 316 artifact logic, chỉ lưu 224 nội dung khác nhau (loại 92 bản sao giống từng byte). Dashboard đọc trực tiếp; CLI tự giải gói/đóng lại khi tính toán. Xem [cấu trúc và cách đọc](results/README.md). Chia mẫu, RMSE và nhãn R giữ nguyên; không ước lượng lại ở lần tổ chức kết quả/giao diện này. Cơ sở và giả định: [EXTERNAL_METHODS](docs/EXTERNAL_METHODS.md). Spec: [CAPABILITY_MAP](CAPABILITY_MAP.md); plan: [tasks/plan.md](tasks/plan.md), trạng thái: [tasks/todo.md](tasks/todo.md).
 
 Không sinh bài/PDF mới trong lượt này. Bài và PDF bên dưới là **bản gốc Binance-only ngày 16/10**, chưa bao gồm thí nghiệm mở rộng.
 
@@ -44,11 +44,11 @@ Chạy `run_dashboard.cmd`, hoặc tại thư mục repository:
 .\.venv\Scripts\python.exe -m streamlit run dashboard.py
 ```
 
-Mở **http://127.0.0.1:8501**. Dashboard đọc kết quả đã tính, không tải mạng hoặc huấn luyện lại khi đổi bộ lọc.
+Mở địa chỉ được hiển thị sau khi chạy (mặc định **http://127.0.0.1:8501**). Dashboard đọc kết quả đã tính, không tải mạng hoặc huấn luyện lại khi đổi bộ lọc.
 
 - [Bài nghiên cứu PDF](paper/bao_cao_nghien_cuu.pdf)
 - [Bản Markdown để sửa](paper/bao_cao_nghien_cuu.md)
-- [Bảng hiệu quả danh mục](results/portfolio_performance.csv)
+- [Bảng hiệu quả danh mục](results/tables/portfolio_performance.csv)
 - [Hình PNG/PDF](paper/figures/)
 - [Tiến trình và giới hạn bàn giao](docs/progress.md)
 
@@ -129,7 +129,7 @@ Raw, môi trường Python và cache thử nghiệm được giữ cục bộ, b
 - Chỉ so joint score khi cùng bộ biến. Xác suất sigma cao nhất là proxy rủi ro, không phải nhãn khủng hoảng đã xác thực.
 - Archive được tải hồi cứu; không có đầy đủ historical vintages để bảo đảm point-in-time tuyệt đối.
 - Recovery 100 lần có sai số Monte Carlo đáng kể; không chứng minh một cỡ mẫu tối thiểu phổ quát hoặc số regime thật.
-- **Lịch sử sửa lỗi RNG:** audit tái lập v1 phát hiện statsmodels 0.15 cần truyền `rng` trực tiếp. Bản v2 dùng `rng=11`, giữ v1 và công khai thay đổi. Holdout đã được xem ở v1; v2 là tái tính sửa lỗi, không phải holdout mới chưa từng được xem. Xem [revision](results/revision.json) và [lịch sử](docs/history/).
+- **Lịch sử sửa lỗi RNG:** audit tái lập v1 phát hiện statsmodels 0.15 cần truyền `rng` trực tiếp. Bản v2 dùng `rng=11`, giữ v1 và công khai thay đổi. Holdout đã được xem ở v1; v2 là tái tính sửa lỗi, không phải holdout mới chưa từng được xem. Xem [revision trong gói kết quả](results/README.md) và [lịch sử](docs/history/).
 - Literature matrix ghi rõ phần chỉ đọc abstract/preview; không nhận là tổng quan hệ thống toàn văn.
 
 ## Kiểm tra code

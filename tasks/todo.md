@@ -11,3 +11,10 @@
 Kết quả: 30 cấu hình bổ sung cho hai tài sản, 638 ngày/cấu hình; tất cả refit cuối hội tụ. HDBSCAN_DENSITY chọn min_cluster_size BTC17/ETH23 trên train; các cấu hình thô thất bại vẫn giữ.
 
 E08 đạt: clone sạch cài 63 pin, 14 tests, tải lại nguồn/khớp hash; verify 141 artifacts gốc +189 artifacts mở rộng/14 inputs; UI BTC/ETH và Edge desktop/mobile đã qua. Không sinh PDF; chưa push.
+
+
+## Dashboard và kết quả thống nhất
+- [x] D01 — Gói kết quả và bảng chung, kiểm tra nguyên vẹn.
+- [x] D02 — Dashboard thống nhất và menu trái.
+- [x] D03 — Data và phương pháp chung, bố cục theo reference.
+- [ ] D04 — QA, clone, tài liệu và bàn giao.

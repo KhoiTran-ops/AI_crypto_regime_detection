@@ -2,7 +2,7 @@
 import argparse
 
 
-def main():
+def _main():
     parser = argparse.ArgumentParser(description="Binance crypto regime research")
     parser.add_argument("command", choices=["data", "select", "adequacy", "evaluate", "intervals",
                                             "publish", "verify", "reproduce", "external-data", "extend", "verify-extensions", "all"])
@@ -14,8 +14,8 @@ def main():
         from .supply import add_supply
         add_supply(build_external(refresh=args.refresh))
     if args.command == "extend":
-        from .data import ROOT
-        if (ROOT / "results/extensions/artifact_hashes.json").exists() and not args.recompute:
+        from .results import Results
+        if Results().exists("extensions/artifact_hashes.json") and not args.recompute:
             from .reproduce import verify_extensions
             verify_extensions()
             print("Published extension results reused. --recompute rebuilds data/summaries using valid model caches.")
@@ -75,6 +75,22 @@ def main():
     if args.command == "reproduce":
         from .reproduce import reproduce
         reproduce()
+
+
+def main():
+    import sys
+
+    from .results import Results, materialized_results
+    if (len(sys.argv) > 1 and sys.argv[1] == "extend" and "--recompute" not in sys.argv
+            and Results().exists("extensions/artifact_hashes.json")):
+        _main()
+        return
+    commands = {"select", "adequacy", "evaluate", "intervals", "publish", "reproduce", "extend", "external-data", "all"}
+    if len(sys.argv) > 1 and sys.argv[1] in commands:
+        with materialized_results():
+            _main()
+    else:
+        _main()
 
 
 if __name__ == "__main__":

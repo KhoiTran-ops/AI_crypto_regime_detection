@@ -1,5 +1,0 @@
-n_days,repetitions,heavy_tail,convergence_rate,convergence_mcse,transition_rmse,volatility_relative_rmse,asset,k,passes_project_precision_targets,status
-1902,100,False,1.0,0.0,0.2715607136483342,0.2622968916823265,BTCUSDT,5,False,Rejected pilot; absolute volume and single-start estimator
-1902,100,False,1.0,0.0,0.3021731596162014,0.243477861307461,BTCUSDT,4,False,Rejected pilot; absolute volume and single-start estimator
-1902,100,False,1.0,0.0,0.1211975804799706,0.0901808515597295,BTCUSDT,3,False,Rejected pilot; absolute volume and single-start estimator
-1902,100,False,1.0,0.0,0.1435032169182418,0.0533317114475935,BTCUSDT,2,False,Rejected pilot; absolute volume and single-start estimator

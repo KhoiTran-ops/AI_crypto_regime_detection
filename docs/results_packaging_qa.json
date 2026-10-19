@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "before_tracked_files": 316,
+  "logical_files": 316,
+  "unique_contents": 224,
+  "identical_copies_removed": 92,
+  "archive_bytes": 5395452,
+  "all_original_bytes_compared_before_cleanup": true,
+  "before_bytes": 10819843,
+  "after_output_files": 8,
+  "after_bytes": 5488432,
+  "documentation_files": 1
+}

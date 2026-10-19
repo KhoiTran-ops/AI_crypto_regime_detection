@@ -11,13 +11,21 @@ from . import final
 from .data import ROOT, config, normalize_spot, read_archive, save_json
 
 
+def published_bytes(path):
+    from .results import Results
+    relative = path.relative_to(ROOT).as_posix()
+    return Results().read(relative[len("results/"):]) if relative.startswith("results/") else path.read_bytes()
+
+
 def verify():
-    manifest = json.loads((ROOT / "results/artifact_hashes.json").read_text(encoding="utf-8"))
+    from .results import verify_results
+    verify_results()
+    manifest = json.loads(published_bytes(ROOT / "results/artifact_hashes.json"))
     changed = [name for name, expected in manifest.items()
-               if not (ROOT / name).exists() or hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected]
+               if hashlib.sha256(published_bytes(ROOT / name)).hexdigest() != expected]
     if changed:
         raise ValueError(f"Published artifacts changed: {changed}")
-    lock = json.loads((ROOT / "results/protocol_lock.json").read_text(encoding="utf-8"))["protocol"]
+    lock = json.loads(published_bytes(ROOT / "results/protocol_lock.json"))["protocol"]
     for name, expected in lock["scientific_code"].items():
         if hashlib.sha256((ROOT / name.replace("\\", "/")).read_bytes()).hexdigest() != expected:
             raise ValueError(f"Scientific code changed after protocol lock: {name}")
@@ -122,16 +130,16 @@ def seal_extensions():
 def verify_extensions():
     verify()
     folder = ROOT / "results/extensions"
-    protocol = json.loads((folder / "protocol.json").read_text(encoding="utf-8"))
+    protocol = json.loads(published_bytes(folder / "protocol.json"))
     checked_inputs = (protocol["hashes"] | protocol.get("supply_addendum", {}).get("hashes", {})
                       | protocol.get("density_addendum", {}).get("hashes", {}))
     for name, expected in checked_inputs.items():
-        if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
+        if hashlib.sha256(published_bytes(ROOT / name)).hexdigest() != expected:
             raise ValueError("Extension input/source changed: " + name)
-    artifacts = json.loads((folder / "artifact_hashes.json").read_text(encoding="utf-8"))
+    artifacts = json.loads(published_bytes(folder / "artifact_hashes.json"))
     for name, expected in artifacts.items():
-        if hashlib.sha256((folder / name).read_bytes()).hexdigest() != expected:
+        if hashlib.sha256(published_bytes(folder / name)).hexdigest() != expected:
             raise ValueError("Extension artifact changed: " + name)
-    if json.loads((folder / "run.json").read_text(encoding="utf-8"))["fingerprint"] != protocol["fingerprint"]:
+    if json.loads(published_bytes(folder / "run.json"))["fingerprint"] != protocol["fingerprint"]:
         raise ValueError("Run and extension protocol differ")
     print(f"Verified {len(artifacts)} extension artifacts and {len(checked_inputs)} locked inputs", flush=True)
