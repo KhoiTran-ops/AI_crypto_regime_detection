@@ -1,0 +1,7 @@
+{
+  "sha256": "650806a723c4cef2788f8efd3af6b0b4be826810f37c4c3111b77260c6a41916",
+  "observations": 3228,
+  "source": "https://stablecoins.llama.fi/stablecoincharts/all",
+  "field": "totalCirculating.peggedUSD",
+  "unit": "USD face value at peg; not mark-to-market USD capitalization"
+}

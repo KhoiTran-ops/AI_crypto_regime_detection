@@ -28,3 +28,5 @@ data/snapshots/external_observations.parquet
 outputs/external_download.json
 results/extensions/external_panel.parquet
 results/extensions/*_features.parquet
+
+.pytest-tmp/
