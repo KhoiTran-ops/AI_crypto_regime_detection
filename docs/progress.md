@@ -1,6 +1,6 @@
 ## Hợp nhất kết quả và dashboard · 19/10/2026
 
-316 artifact được bảo toàn từng byte trong gói content-addressed, 224 nội dung duy nhất (loại 92 bản sao). Kết quả công bố gồm 7 bảng CSV + research.zip: 10,82 → 5,49 MB. Dashboard 5 trang thống nhất; 24 cấu hình/tài sản, biểu đồ return mặc định 19 mô hình, joint-core 2; Data gom mọi nhóm nguồn và phương pháp. Không đổi mẫu/RMSE/R hay fit lại. Kiểm tra: 15 tests, 62 tổ hợp AppTest, Edge desktop/mobile, hash khoa học và summary khớp. Chi tiết QA: docs/dashboard_qa.json, docs/results_packaging_qa.json.
+316 artifact được bảo toàn từng byte trong gói content-addressed, 224 nội dung duy nhất (loại 92 bản sao). Kết quả công bố gồm 7 bảng CSV + research.zip: 10,82 → 5,49 MB. Dashboard 5 trang thống nhất; 24 cấu hình/tài sản, biểu đồ return mặc định 19 mô hình, joint-core 2; Data gom mọi nhóm nguồn và phương pháp. Không đổi mẫu/RMSE/R hay fit lại. Kiểm tra: 15 tests, 62 tổ hợp AppTest, Edge desktop/mobile, hash khoa học và summary khớp. Clone sạch không raw/cache chạy verify/extend/15 tests và mọi trang BTC/ETH; working tree giữ sạch. Chi tiết QA: docs/dashboard_qa.json, docs/results_packaging_qa.json.
 
 > Cập nhật 19/10/2026: đã mở rộng ngoài Binance-only với 30 cấu hình bổ sung. Xem [task mới](../tasks/todo.md), [phương pháp mở rộng](EXTERNAL_METHODS.md) và [QA](extension_qa.json). Nội dung 16/10 bên dưới được giữ như lịch sử bản gốc; bài/PDF cũ chưa cập nhật.
 

@@ -33,7 +33,9 @@
         "body": 1440,
         "viewport": 1440
       }
-    }
+    },
+    "supply_chart_axis_verified": "Cung stablecoin · USD mệnh giá",
+    "screenshots_after_script_idle": true
   },
   "js_errors": [],
   "app_check_count": 62,
@@ -57,5 +59,27 @@
     "MSGARCH",
     "TVTP_MACRO",
     "TVTP_SUPPLY"
-  ]
+  ],
+  "fresh_clone": {
+    "status": "passed",
+    "commands": [
+      {
+        "command": "-m regime.cli verify-extensions",
+        "status": "passed"
+      },
+      {
+        "command": "-m regime.cli extend",
+        "status": "passed"
+      },
+      {
+        "command": "-m pytest -q",
+        "status": "passed"
+      }
+    ],
+    "both_assets_all_pages": true,
+    "no_private_data_or_cache": true,
+    "external_series_download_control": true,
+    "working_tree_clean_after_commands": true,
+    "dependencies": "Reused unchanged pinned environment; no second dependency install in this check"
+  }
 }

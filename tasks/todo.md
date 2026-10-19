@@ -17,4 +17,6 @@ E08 đạt: clone sạch cài 63 pin, 14 tests, tải lại nguồn/khớp hash;
 - [x] D01 — Gói kết quả và bảng chung, kiểm tra nguyên vẹn.
 - [x] D02 — Dashboard thống nhất và menu trái.
 - [x] D03 — Data và phương pháp chung, bố cục theo reference.
-- [ ] D04 — QA, clone, tài liệu và bàn giao.
+- [x] D04 — QA, clone, tài liệu và bàn giao.
+
+D04 đạt: clone sạch không cache/raw, 15 tests; verify/extend không làm thay đổi working tree; UI BTC/ETH và download control khi chưa có ngoại sinh hoạt động. Edge 320–1440 px; return chart 19, joint-core 2. Không fit lại hoặc đổi mẫu/RMSE/R.
