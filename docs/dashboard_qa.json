@@ -90,7 +90,7 @@
     },
     "unrelated_model_labels": "GMM real-browser; other models unit-tested",
     "report": "results/tom_tat_ket_qua.html",
-    "html_sha256": "7e9438dc5cc1957b8ddf06533fa1c10ebe215d92ed6c226329cbefedd850f9e1",
+    "html_sha256": "67f810747eb121be01ebc51015e79010960497efd9c130ee2b6a783acd67ec26",
     "research_zip_sha256": "ba9cfd8f6205c3c66fc43e1ddfdd75cd9455b3723058539a84746fca86e0dc26",
     "tables": 19,
     "inline_svg_figures": 5,

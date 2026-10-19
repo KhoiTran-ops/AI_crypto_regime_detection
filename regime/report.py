@@ -52,7 +52,7 @@ def figure(fig, caption):
     output = StringIO()
     fig.savefig(output, format="svg", bbox_inches="tight", metadata={"Date": None})
     plt.close(fig)
-    svg = output.getvalue().split("<svg", 1)[1]
+    svg = " " + " ".join(output.getvalue().split("<svg", 1)[1].split())
     return '<figure><svg' + svg + '<figcaption>' + escape(caption) + '</figcaption></figure>'
 
 
