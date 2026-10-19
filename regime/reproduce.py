@@ -43,6 +43,7 @@ def verify():
 
 def reproduce():
     verify()
+    (ROOT / ".tools").mkdir(exist_ok=True)
     checked = 0
     for path in (ROOT / "data/raw").rglob("*.zip"):
         expected = path.with_suffix(".zip.CHECKSUM").read_text().split()[0]
@@ -83,7 +84,6 @@ def reproduce():
         pd.testing.assert_frame_equal(rebuilt, saved, check_freq=False)
     print("Raw spot, funding and OI replay matched all six processed datasets", flush=True)
     original = final.FINAL
-    (ROOT / ".tools").mkdir(exist_ok=True)
     try:
         with TemporaryDirectory(prefix="reproduction-", dir=ROOT / ".tools") as directory:
             final.FINAL = Path(directory)

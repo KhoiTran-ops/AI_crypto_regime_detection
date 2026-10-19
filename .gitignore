@@ -8,6 +8,8 @@ data/raw/
 data/processed/
 outputs/runs/
 .env
+.env.*
+!.env.example
 *.log
 
 outputs/pilot_absolute_volume/
@@ -30,3 +32,9 @@ results/extensions/external_panel.parquet
 results/extensions/*_features.parquet
 
 .pytest-tmp/
+
+# Local packaging and operating-system files.
+build/
+dist/
+.DS_Store
+Thumbs.db

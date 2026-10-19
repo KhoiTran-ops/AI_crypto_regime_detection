@@ -36,3 +36,21 @@ def test_primary_regime_labels_do_not_leak_across_models():
     for model in ("GMM", "HMM_return", "HMM_B", "TVTP_MACRO", "MSGARCH"):
         assert state_label("BTCUSDT", model, 0) == "R1"
     assert state_label("ETHUSDT", "HDBSCAN_DENSITY", -1) == "Noise"
+
+
+def test_reproduce_initializes_workdir_on_clean_checkout(tmp_path, monkeypatch):
+    from regime import derivatives, reproduce
+
+    monkeypatch.setattr(reproduce, "ROOT", tmp_path)
+    monkeypatch.setattr(reproduce, "verify", lambda: None)
+    monkeypatch.setattr(reproduce, "config", lambda: {"assets": []})
+
+    class ReplayReached(Exception):
+        pass
+
+    def stop_at_replay():
+        raise ReplayReached
+
+    monkeypatch.setattr(derivatives, "funding", stop_at_replay)
+    with pytest.raises(ReplayReached):
+        reproduce.reproduce()
