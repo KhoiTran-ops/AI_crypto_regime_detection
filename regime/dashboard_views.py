@@ -9,7 +9,7 @@ import streamlit as st
 from scipy.special import softmax
 
 from .data import ROOT, config
-from .labels import LABEL_NOTE, state_label
+from .labels import label_note, label_predictions, state_label
 from .results import Results, materialized_results
 
 COLORS = ["#147d78", "#4263eb", "#c98a25", "#b85651", "#875db2", "#6b7280"]
@@ -89,7 +89,10 @@ def table(frame, formats=None):
 
 def prediction(asset, model):
     path = Results().model_path(asset, model)
-    return read_table(path), path.removesuffix(".parquet")
+    base = path.removesuffix(".parquet")
+    record = read_json(base + (".json" if base.startswith("extensions/") else ".diagnostics.json"))
+    diagnostics = record["diagnostics"] if isinstance(record, dict) else record
+    return label_predictions(asset, model, read_table(path), diagnostics), base
 
 
 def probabilities(value):
@@ -100,8 +103,14 @@ def signal_chart(value, model, asset):
     cols = probabilities(value)
     if cols:
         fig = go.Figure()
-        for i, col in enumerate(cols):
-            fig.add_trace(go.Scatter(x=value.index, y=value[col], name=state_label(asset, model, i), stackgroup="one",
+        if model == "MSGARCH":
+            high = value.display_high_state.eq(1)
+            signals = [("Low-volatility regime", np.where(high, value.p_0, value.p_1)),
+                       ("High-volatility regime", np.where(high, value.p_1, value.p_0))]
+        else:
+            signals = [(state_label(asset, model, i, k=len(cols)), value[col]) for i, col in enumerate(cols)]
+        for i, (name, values) in enumerate(signals):
+            fig.add_trace(go.Scatter(x=value.index, y=values, name=name, stackgroup="one",
                                     line=dict(width=.5, color=COLORS[i % len(COLORS)])))
         fig.update_yaxes(range=[0, 1], tickformat=".0%", title_text={"KMeans": "Cluster assignment indicator", "GMM": "Component probability"}.get(model, "Filtered probability"))
     elif "change_probability" in value:
@@ -109,25 +118,29 @@ def signal_chart(value, model, asset):
                       labels={"change_probability": "Change-point probability", "date": "Ngày UTC"})
     else:
         plotted = value.copy()
-        plotted["Cluster"] = plotted.state.map(lambda x: "Noise" if x == -1 else f"R{int(x)+1}")
+        plotted["Cluster"] = plotted.market_regime
         fig = px.scatter(plotted, x=plotted.index, y="membership_strength" if "membership_strength" in value else "state",
                          color="Cluster", color_discrete_sequence=COLORS, labels={"date": "Ngày UTC"})
-    chart(fig, 305 if model == "HMM" else 260)
+    chart(fig, 305 if cols else 260)
 
 
 def overview(asset, model):
     market = read_table(f"{asset}_market.parquet")
     value, _ = prediction(asset, model)
     last, current = value.iloc[-1], market.loc[value.index[-1]]
-    state = f"R{int(last.state)+1}" if "state" in value and last.state >= 0 else "—"
-    if "noise" in value and last.noise:
-        state = "Noise"
-    grid_metrics([("Close price · USDT", f"{current.close:,.2f}"), ("Market regime · " + model, state),
+    state = last.market_regime.split(" · ", 1)[0] if "market_regime" in value else "—"
+    risk_label = "Highest-volatility cluster indicator" if model == "KMeans" else "P(highest-volatility state)"
+    risk_value = f"{last.p_high_vol:.1%}" if "p_high_vol" in value else "—"
+    if "membership_strength" in value:
+        risk_label, risk_value = "Membership strength", f"{last.membership_strength:.3f}"
+    elif model == "BOCPD":
+        risk_label, risk_value = "MAP run length · days", f"{int(last.map_run_length):,}"
+    grid_metrics([("Close price · USDT", f"{current.close:,.2f}"), ("Change-point probability" if model == "BOCPD" else "Market regime · " + model,
+                   f"{last.change_probability:.1%}" if model == "BOCPD" else state),
                   ("30-day annualized volatility", f"{current.rv30:.1%}"),
-                  ("Highest-volatility cluster indicator" if model == "KMeans" else "P(highest-volatility state)",
-                   f"{last.p_high_vol:.1%}" if "p_high_vol" in value else "—")])
-    if model == "HMM":
-        st.caption("Trạng thái hiện tại: " + state_label(asset, model, last.state))
+                  (risk_label, risk_value)])
+    if "market_regime" in value:
+        st.caption("Trạng thái hiện tại: " + last.market_regime)
     main, side = st.columns([2.25, 1])
     with main, st.container(border=True, key="card_price"):
         st.subheader("Price and market regimes")
@@ -137,15 +150,14 @@ def overview(asset, model):
         joined = visible.join(market[["close"]])
         fig = go.Figure(go.Scatter(x=joined.index, y=joined.close, name="Close price", line=dict(color="#26364b", width=1.4)))
         if "state" in joined:
-            for i, state_id in enumerate(sorted(joined.state.unique())):
-                points = joined.loc[joined.state.eq(state_id)]
+            for name, points in joined.groupby("market_regime", sort=True):
+                state_id = int(points.state.iloc[0])
                 fig.add_trace(go.Scatter(x=points.index, y=points.close, mode="markers",
-                    name=state_label(asset, model, state_id),
-                    marker=dict(size=4, color=COLORS[i % len(COLORS)])))
+                    name=name,
+                    marker=dict(size=4, color=COLORS[state_id % len(COLORS)] if state_id >= 0 else COLORS[-1])))
         fig.update_yaxes(title_text="USDT")
         chart(fig, 405 if model == "HMM" else 365)
-        if model == "HMM":
-            st.caption(LABEL_NOTE)
+        st.caption(label_note(model))
     with side, st.container(border=True, key="card_study"):
         st.subheader("Hồ sơ nghiên cứu")
         st.metric("Tài sản", asset.replace("USDT", " / USDT"))
@@ -272,9 +284,14 @@ def states(asset, model):
             labels = [f"S{i+1} raw" for i in range(len(matrix))]
         with left, st.container(border=True, key="card_transition"):
             st.subheader("Transition matrix")
-            chart(px.imshow(matrix, x=labels, y=labels, text_auto=".2f", zmin=0, zmax=1,
+            names = [state_label(asset, model, i, k=len(matrix),
+                     high_state=latest.get("high_unconditional_variance_state")) for i in range(len(matrix))]
+            fig = px.imshow(matrix, x=labels, y=labels, text_auto=".2f", zmin=0, zmax=1,
                             color_continuous_scale=["#f1f7f6", "#147d78"],
-                            labels={"x": "Next day", "y": "Current day", "color": "Probability"}), 325)
+                            labels={"x": "Next day", "y": "Current day", "color": "Probability"})
+            fig.update_traces(customdata=[[f"{a}<br>→ {b}" for b in names] for a in names],
+                              hovertemplate="%{customdata}<br>P=%{z:.3f}<extra></extra>")
+            chart(fig, 325)
     with right if transitions else st.container(), st.container(border=True, key="card_regime_profile"):
         st.subheader("Regime profiles")
         if model == "HMM":
@@ -284,13 +301,14 @@ def states(asset, model):
             table(profiles,
                   {"mean_return_daily": "{:.3%}", "volatility_annual": "{:.1%}", "occupancy": "{:.1%}",
                    "persistence": "{:.3f}", "expected_duration_days": "{:.1f}"})
-            st.caption(LABEL_NOTE)
+            st.caption(label_note(model))
         elif "state" in value:
-            counts = value.state.value_counts(normalize=True).rename_axis("state").reset_index(name="Observation share")
-            counts["state"] = counts.state.map(lambda v: "Noise" if v == -1 else f"R{int(v)+1}")
+            counts = value.market_regime.value_counts(normalize=True).rename_axis("Market regime").reset_index(name="Observation share")
             table(counts, {"Observation share": "{:.1%}"})
         elif model == "BOCPD":
             table(pd.DataFrame([record["decision"]]))
+        if model != "HMM":
+            st.caption(label_note(model))
     coefficient_path = base + ("_coefficients.csv" if base.startswith("extensions/") else ".coefficients.csv")
     if store.exists(coefficient_path):
         with st.container(border=True, key="card_coefficients"):
@@ -312,6 +330,8 @@ def states(asset, model):
             variance = np.exp(theta[:2])*fit["scale"]**2
             for state_id in range(2):
                 rows.append({"Tháng": fit["period"][:10], "Raw state": f"S{state_id+1}",
+                    "Market regime": state_label(asset, model, state_id,
+                        high_state=fit["high_unconditional_variance_state"]).split(" · ", 1)[1],
                     "alpha": weights[state_id, 0], "beta": weights[state_id, 1],
                     "omega": variance[state_id]*weights[state_id, 2], "Annualized sigma": np.sqrt(365*variance[state_id])})
         with st.container(border=True, key="card_garch_parameters"):

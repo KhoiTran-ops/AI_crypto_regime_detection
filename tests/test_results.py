@@ -33,9 +33,10 @@ def test_primary_regime_labels_do_not_leak_across_models():
     assert state_label("BTCUSDT", "HMM", 3) == "R4 · High-volatility regime"
     assert state_label("ETHUSDT", "HMM", 3) == "R4 · Bearish regime — high volatility"
     assert state_label("ETHUSDT", "HMM", 4) == "R5 · High-volatility regime"
-    for model in ("GMM", "HMM_return", "HMM_B", "TVTP_MACRO", "MSGARCH"):
+    for model in ("GMM", "HMM_return", "HMM_B", "TVTP_MACRO"):
         assert state_label("BTCUSDT", model, 0) == "R1"
-    assert state_label("ETHUSDT", "HDBSCAN_DENSITY", -1) == "Noise"
+    assert state_label("BTCUSDT", "MSGARCH", 0) == "S1 raw"
+    assert state_label("ETHUSDT", "HDBSCAN_DENSITY", -1) == "Noise · Unclassified observations"
 
 
 def test_reproduce_initializes_workdir_on_clean_checkout(tmp_path, monkeypatch):
@@ -54,3 +55,26 @@ def test_reproduce_initializes_workdir_on_clean_checkout(tmp_path, monkeypatch):
     monkeypatch.setattr(derivatives, "funding", stop_at_replay)
     with pytest.raises(ReplayReached):
         reproduce.reproduce()
+
+
+def test_labels_follow_each_fit_without_changing_predictions():
+    import pandas as pd
+
+    from regime.labels import label_predictions, state_label
+
+    assert "Low-volatility" in state_label("ETHUSDT", "GMM", 0, k=5)
+    assert "Intermediate-volatility" in state_label("BTCUSDT", "HMM_B", 1, k=3)
+    assert "High-volatility" in state_label("BTCUSDT", "TVTP_MACRO", 1, k=2)
+    index = pd.to_datetime(["2025-01-01", "2025-02-01"], utc=True)
+    value = pd.DataFrame({"state": [1, 1]}, index=index)
+    fits = [{"period": str(index[0]), "clusters": 2}, {"period": str(index[1]), "clusters": 3}]
+    labeled = label_predictions("BTCUSDT", "HDBSCAN_DENSITY", value, fits)
+    assert "High-volatility" in labeled.market_regime.iloc[0]
+    assert "Intermediate-volatility" in labeled.market_regime.iloc[1]
+    fits = [{"period": str(index[0]), "high_unconditional_variance_state": 1},
+            {"period": str(index[1]), "high_unconditional_variance_state": 0}]
+    labeled = label_predictions("ETHUSDT", "MSGARCH", value, fits)
+    assert "High-volatility" in labeled.market_regime.iloc[0]
+    assert "Low-volatility" in labeled.market_regime.iloc[1]
+    pd.testing.assert_frame_equal(labeled[value.columns], value)
+    assert list(value) == ["state"]
