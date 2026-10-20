@@ -20,6 +20,7 @@
 .eyebrow { font-size:10px; letter-spacing:1.8px; font-weight:650; color:#0f766e; margin-bottom:5px; }
 h1 { font-size:1.8rem !important; letter-spacing:-.7px; padding-top:0 !important; color:var(--ink); }
 h3 { font-size:1.05rem !important; font-weight:650 !important; letter-spacing:-.2px; color:var(--ink); }
+[data-testid="stHeaderActionElements"] a[href^="#"] { display:none; }
 .page-rule { height:3px; background:linear-gradient(90deg, #0d9488 0 12%, #2563eb 12% 24%, var(--line) 24%); margin:4px 0 22px; border-radius:2px; }
 .snapshot { font-size:10px; color:var(--muted); letter-spacing:1px; padding:7px 0; }
 .snapshot strong { font-size:16px; color:var(--ink); letter-spacing:0; }
