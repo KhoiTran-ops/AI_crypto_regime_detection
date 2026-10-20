@@ -18,8 +18,6 @@ if "page" not in st.session_state:
     st.session_state.page = "Tổng quan"
 
 with st.sidebar:
-    st.markdown('<div class="brand"><span>CR</span><div>Crypto Regime<small>RESEARCH DASHBOARD</small></div></div>',
-                unsafe_allow_html=True)
     for label, (icon, _) in PAGES.items():
         st.button(label, icon=icon, key="nav_" + label, width="stretch",
                   type="primary" if st.session_state.page == label else "secondary",

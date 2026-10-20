@@ -10,11 +10,10 @@
 [data-testid="stSidebarHeader"] { min-height:38px; height:38px; }
 [data-testid="stSidebarHeader"] button { color:var(--nav-muted); }
 [data-testid="stSidebarUserContent"] { padding:12px 0; }
-.brand>div { white-space:nowrap; }
-.brand { display:flex; align-items:center; gap:11px; margin:0 4px 32px; font-weight:650; font-size:17px; color:#fff; }
-.brand>span { display:grid; place-items:center; width:37px; height:37px; border-radius:10px; background:var(--accent); color:white; font-size:13px; }
-.brand small { display:block; font-size:9px; color:var(--nav-muted); letter-spacing:1.1px; margin-top:3px; }
-[data-testid="stSidebar"] button { border:1px solid transparent; text-align:left; justify-content:flex-start; border-radius:8px; min-height:44px; padding-left:15px; }
+[data-testid="stSidebar"] [data-testid="stButton"] button { border:1px solid transparent; text-align:left; border-radius:8px; min-height:48px; padding:0 20px !important; }
+[data-testid="stSidebar"] [data-testid="stButton"] button>div { justify-content:flex-start !important; align-items:center; width:100%; }
+[data-testid="stSidebar"] [data-has-shortcut] { display:flex; align-items:center; gap:12px; }
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p { text-align:left; }
 [data-testid="stSidebar"] button[kind="secondary"] { background:transparent; color:var(--nav-muted); }
 [data-testid="stSidebar"] button[kind="primary"] { background:#0f766e; border-color:#319b94; color:#fff; box-shadow:inset 3px 0 #5eead4; }
 [data-testid="stSidebar"] button:hover { background:#25435f; color:#fff; }
