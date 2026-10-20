@@ -12,7 +12,7 @@ from .data import ROOT, config
 from .labels import label_note, label_predictions, state_label
 from .results import Results, materialized_results
 
-COLORS = ["#147d78", "#4263eb", "#c98a25", "#b85651", "#875db2", "#6b7280"]
+COLORS = ["#0d9488", "#2563eb", "#d68a12", "#dc5266", "#8754c8", "#64748b"]
 STRATEGIES = {"buy_hold": "Buy-and-hold", "vol_target": "Volatility targeting", "regime_aware": "Regime-aware"}
 SERIES = {"close": "Close price · USDT", "quote_volume": "Quote volume · USDT", "rv30": "30-day annualized volatility",
           "funding": "Funding · tổng ngày", "oi": "Open interest · đơn vị tài sản", "vix": "VIX", "dxy": "DXY",
@@ -63,8 +63,8 @@ def chart(fig, height=340):
 
 
 def grid_metrics(items):
-    for column, (label, value) in zip(st.columns(len(items)), items, strict=True):
-        with column, st.container(border=True, key="card_" + label):
+    for i, (column, (label, value)) in enumerate(zip(st.columns(len(items)), items, strict=True)):
+        with column, st.container(border=True, key=f"card_metric_{i}"):
             st.metric(label, value)
 
 
