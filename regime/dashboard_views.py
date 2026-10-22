@@ -124,24 +124,28 @@ def overview(asset, model):
     main, side = st.columns([2.25, 1])
     with main, st.container(border=True, key="card_price"):
         st.subheader("Price and market regimes")
-        selection_key, end_key = "display_range_" + asset, "display_end_" + asset
-        default = st.session_state.get(selection_key) or (market.index[0].date(), market.index[-1].date())
+        selection_key, end_key = "display_range_v2_" + asset, "display_end_v2_" + asset
+        start = max(market.index[0].date(), pd.Timestamp(config()["test_start"]).date())
+        default = st.session_state.get(selection_key) or (start, market.index[-1].date())
         if len(default) == 2 and default[-1] == st.session_state.get(end_key):
             default = (default[0], market.index[-1].date())
         selected = st.date_input("Khoảng hiển thị", default, min_value=market.index[0].date(),
-                                 max_value=market.index[-1].date(), key=f"display_dates_{asset}_{market.index[-1].date()}")
+                                 max_value=market.index[-1].date(), key=f"display_dates_v2_{asset}_{market.index[-1].date()}")
         st.session_state[selection_key] = selected
         st.session_state[end_key] = market.index[-1].date()
         window = slice(str(selected[0]), str(selected[-1])) if selected and len(selected) == 2 else slice(None)
-        prices = market.loc[window]
+        prices = market
         visible = value.loc[window]
         fig = go.Figure(go.Scatter(x=prices.index, y=prices.close, name="Daily close", line=dict(color="#26364b", width=1.4)))
-        if "state" in visible:
-            joined = visible.join(prices[["close"]], how="inner")
+        if "state" in value:
+            joined = value.join(prices[["close"]], how="inner")
             for name, points in joined.groupby("market_regime", sort=True):
                 state_id = int(points.state.iloc[0])
                 fig.add_trace(go.Scatter(x=points.index, y=points.close, mode="markers", name=name,
                     marker=dict(size=4, color=COLORS[state_id % len(COLORS)] if state_id >= 0 else COLORS[-1])))
+        if selected and len(selected) == 2:
+            fig.update_xaxes(range=[str(selected[0]), str(selected[-1])])
+        fig.update_layout(dragmode="pan")
         fig.update_yaxes(title_text="USDT")
         chart(fig, 405 if model == "HMM" else 365)
         st.caption(label_note(model))
