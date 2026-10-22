@@ -46,6 +46,33 @@ Mở **http://127.0.0.1:8501**. Dừng server bằng `Ctrl+C`.
 
 Dashboard có thể chạy ngay sau cài đặt bằng các file có sẵn trong repo.
 
+## Cập nhật trực tiếp
+
+Dashboard tự khởi động worker dùng chung: giá mỗi 60 giây; mô hình cập nhật sau khi ngày UTC hoàn tất. Giữ server chạy để duy trì cập nhật. Dữ liệu/cache live nằm trong `data/live/`, không cần commit. Các trang nghiên cứu giữ kết quả đã chốt.
+
+Chạy worker độc lập (không cần mở trình duyệt):
+
+```powershell
+.\.venv\Scripts\python.exe -m regime.cli live
+```
+
+Chạy một lượt rồi thoát:
+
+```powershell
+.\.venv\Scripts\python.exe -m regime.cli live --once
+```
+
+Dừng bằng `Ctrl+C`. Worker đang chạy sẽ được tái sử dụng, không nhân số lượt gọi theo số người xem. Khi API yêu cầu chờ, chương trình lưu cooldown và tự thử lại; không đổi IP/endpoint để né chặn.
+
+Chỉ xem cache, không tự khởi động worker:
+
+```powershell
+$env:CRYPTO_LIVE_AUTOSTART = "0"
+.\run_dashboard.cmd
+```
+
+Trên Linux/macOS, dùng `CRYPTO_LIVE_AUTOSTART=0 .venv/bin/python -m streamlit run dashboard.py`.
+
 ## Chạy pipeline
 
 Các lệnh tải dữ liệu cần Internet, không cần API key. Chạy lần lượt:

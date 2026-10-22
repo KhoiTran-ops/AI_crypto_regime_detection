@@ -5,14 +5,21 @@ import argparse
 def _main():
     parser = argparse.ArgumentParser(description="Binance crypto regime research")
     parser.add_argument("command", choices=["data", "select", "adequacy", "evaluate", "intervals",
-                                            "publish", "verify", "reproduce", "report", "external-data", "extend", "verify-extensions", "all"])
+                                            "publish", "verify", "reproduce", "report", "external-data", "extend", "verify-extensions", "live", "all"])
     parser.add_argument("--refresh", action="store_true", help="Download external data only in a new snapshot checkout")
     parser.add_argument("--recompute", action="store_true", help="Rebuild extension data/summaries; valid model caches are retained")
     parser.add_argument("--include-publications", action="store_true",
                         help="Require publication export hashes as well when running verify")
+    parser.add_argument("--once", action="store_true", help="Run one live update and exit")
     args = parser.parse_args()
+    if args.once and args.command != "live":
+        parser.error("--once is only valid with live")
     if args.include_publications and args.command != "verify":
         parser.error("--include-publications is only valid with verify")
+    if args.command == "live":
+        from .live import run
+        run(once=args.once)
+        return
     if args.command == "report":
         from .report import build_report
         build_report()

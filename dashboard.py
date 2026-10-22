@@ -4,6 +4,9 @@ from pathlib import Path
 import streamlit as st
 
 from regime.dashboard_views import PAGES, read_json, summary
+from regime.live_view import live_view, runtime
+
+PAGES = {"Trực tiếp": (":material/sensors:", live_view), **PAGES}
 
 st.set_page_config(page_title="Crypto Regime · Nghiên cứu", page_icon="◈", layout="wide")
 st.markdown("<style>" + (Path(__file__).with_suffix(".css")).read_text(encoding="utf-8") + "</style>",
@@ -15,7 +18,7 @@ def navigate(page):
 
 
 if "page" not in st.session_state:
-    st.session_state.page = "Tổng quan"
+    st.session_state.page = "Trực tiếp"
 
 with st.sidebar:
     for label, (icon, _) in PAGES.items():
@@ -53,4 +56,5 @@ with controls:
         right.markdown('<div class="snapshot">SNAPSHOT<br><strong>30.09.2026</strong></div>', unsafe_allow_html=True)
 
 st.markdown('<div class="page-rule"></div>', unsafe_allow_html=True)
+runtime()
 PAGES[page][1](asset, model)
