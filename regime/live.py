@@ -271,4 +271,3 @@ def run(once=False):
             pass
     except KeyboardInterrupt:
         service.close()
-
