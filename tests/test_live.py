@@ -149,3 +149,49 @@ def test_daily_cutoff_uses_exchange_utc_clock(tmp_path, monkeypatch, stamp, expe
     daily_update(store,Provider())
     assert observed==[expected]
     assert store.json("daily")["complete"]
+
+
+@pytest.mark.parametrize("fail", [False, True])
+def test_fred_attempts_one_batch_per_utc_day_across_restarts(tmp_path, fail):
+    from urllib.parse import parse_qs, urlsplit
+
+    from regime.live import Store
+    from regime.live_data import fred_daily
+
+    calls=[]
+    class Provider:
+        def get(self, url):
+            calls.append(url)
+            if fail:
+                raise TimeoutError("timed out")
+            series=parse_qs(urlsplit(url).query)["id"][0]
+            return f"observation_date,{series}\n2026-10-20,20.5\n".encode()
+    for _ in range(2):
+        store=Store(tmp_path / "live.sqlite")
+        if fail:
+            with pytest.raises(RuntimeError,match="timed out"):
+                fred_daily(store,Provider(),pd.Timestamp("2026-10-21",tz="UTC"))
+        else:
+            assert set(fred_daily(store,Provider(),pd.Timestamp("2026-10-21",tz="UTC")).columns)=={
+                "observation_date","VIXCLS","DGS10","DGS2","SP500"}
+    assert len(calls)==(1 if fail else 4)
+    if fail:
+        with pytest.raises(RuntimeError):
+            fred_daily(store,Provider(),pd.Timestamp("2026-10-22",tz="UTC"))
+    else:
+        fred_daily(store,Provider(),pd.Timestamp("2026-10-22",tz="UTC"))
+    assert len(calls)==(2 if fail else 8)
+    # An older cutoff must not reopen a previously attempted day.
+    if fail:
+        with pytest.raises(RuntimeError):
+            fred_daily(store,Provider(),pd.Timestamp("2026-10-21",tz="UTC"))
+    else:
+        fred_daily(store,Provider(),pd.Timestamp("2026-10-21",tz="UTC"))
+    assert len(calls)==(2 if fail else 8)
+    if not fail:
+        fail=True
+        prior=fred_daily(store,Provider(),pd.Timestamp("2026-10-23",tz="UTC"))
+        assert "VIXCLS" in prior and store.json("fred_daily")["error"]=="timed out"
+        assert store.json("fred_daily")["last_success_cutoff"]=="2026-10-22"
+        fred_daily(Store(tmp_path / "live.sqlite"),Provider(),pd.Timestamp("2026-10-23",tz="UTC"))
+        assert len(calls)==9

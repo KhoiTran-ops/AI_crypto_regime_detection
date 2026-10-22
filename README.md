@@ -48,7 +48,7 @@ Dashboard có thể chạy ngay sau cài đặt bằng các file có sẵn trong
 
 ## Cập nhật trực tiếp
 
-Dashboard tự khởi động worker dùng chung: giá mỗi 60 giây; mô hình cập nhật sau khi ngày UTC hoàn tất. Giữ server chạy để duy trì cập nhật. Dữ liệu/cache live nằm trong `data/live/`, không cần commit. Các trang nghiên cứu giữ kết quả đã chốt.
+Dashboard tự khởi động worker dùng chung: giá mỗi 60 giây; mô hình cập nhật sau khi ngày UTC hoàn tất. FRED chỉ tải một đợt mỗi ngày UTC (từ khoảng 07:05 giờ Việt Nam); nếu lỗi, chờ ngày kế tiếp, không tự thử lặp trong ngày. Giữ server chạy để duy trì cập nhật. Dữ liệu/cache live nằm trong `data/live/`, không cần commit. Các trang nghiên cứu giữ kết quả đã chốt.
 
 Chạy worker độc lập (không cần mở trình duyệt):
 

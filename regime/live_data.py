@@ -96,6 +96,56 @@ def cached_body(store, client, name, url):
     return body
 
 
+
+def fred_daily(store, client, cutoff):
+    """One durable FRED download batch per UTC rollover, including failed attempts."""
+    day=str((cutoff+DAY).date())
+    key="fred_daily"
+    with store.connection() as db:
+        db.execute("BEGIN IMMEDIATE")
+        row=db.execute("SELECT value FROM cache WHERE name=?",(key,)).fetchone()
+        record=json.loads(row[0]) if row else {}
+        claimed=record.get("day","")<day
+        if claimed:
+            record.update(day=day,attempted_at=time.time(),error="FRED download in progress")
+            db.execute("INSERT OR REPLACE INTO cache VALUES (?,?)",(key,json.dumps(record).encode()))
+    if claimed:
+        try:
+            start=pd.Timestamp(config()["end"],tz="UTC")-60*DAY
+            tables=[]
+            for series in ["VIXCLS","DGS10","DGS2","SP500"]:
+                url="https://fred.stlouisfed.org/graph/fredgraph.csv?"+urlencode(
+                    {"id":series,"cosd":str(start.date()),"coed":str(cutoff.date())})
+                body=client.get(url)
+                table=_fred(body)[["observation_date",series]]
+                dates=pd.to_datetime(table.observation_date,utc=True,errors="raise")
+                values=pd.to_numeric(table[series],errors="raise")
+                if table.empty or dates.duplicated().any() or not dates.between(start,cutoff).all():
+                    raise ValueError("Invalid FRED date range: "+series)
+                if not np.isfinite(values.dropna()).all():
+                    raise ValueError("Invalid FRED values: "+series)
+                tables.append(table.assign(**{series:values}))
+                store.blob("raw:fred-"+series,body)
+                store.json("source:fred-"+series,{"fetched_at":time.time(),"url":url,
+                                                "sha256":hashlib.sha256(body).hexdigest()})
+            table=tables[0]
+            for other in tables[1:]:
+                table=table.merge(other,on="observation_date",how="outer",validate="one_to_one")
+            body=table.to_csv(index=False).encode()
+            record.update(error="",last_success_at=time.time(),last_success_cutoff=str(cutoff.date()),
+                          sha256=hashlib.sha256(body).hexdigest())
+            with store.connection() as db:
+                db.executemany("INSERT OR REPLACE INTO cache VALUES (?,?)",
+                               [("raw:fred-daily",body),(key,json.dumps(record).encode())])
+        except Exception as error:
+            record.update(error=str(error) or type(error).__name__,finished_at=time.time())
+            store.json(key,record)
+    body=store.blob("raw:fred-daily")
+    if body is None:
+        raise RuntimeError(record.get("error") or "FRED has no cached observations")
+    return _fred(body)
+
+
 def funding(store, client, asset, cutoff):
     prior = store.frame("funding:"+asset)
     start = prior.index[-1]+DAY if prior is not None and len(prior) else pd.Timestamp(config()["end"], tz="UTC")+DAY
@@ -175,7 +225,7 @@ def interest(store, client, asset, cutoff):
 def external_panel(store, client, cutoff, dates):
     start = pd.Timestamp(config()["end"], tz="UTC")-60*DAY
     sources = {
-        "fred": "https://fred.stlouisfed.org/graph/fredgraph.csv?"+urlencode({"id":"VIXCLS,DGS10,DGS2,SP500", "cosd":str(start.date()), "coed":str(cutoff.date())}),
+        "fred": None,
         "dxy": "https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB?"+urlencode({"period1":int(start.timestamp()), "period2":int((cutoff+DAY).timestamp()), "interval":"1d"}),
         "caps": "https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?"+urlencode({"assets":"btc,eth", "metrics":"CapMrktCurUSD", "start_time":str(start.date()), "end_time":str(cutoff.date()), "page_size":10000}),
         "stablecoins": "https://stablecoins.llama.fi/stablecoincharts/all",
@@ -195,19 +245,12 @@ def external_panel(store, client, cutoff, dates):
     errors = {}
     for name, url in sources.items():
         try:
-            if name == "fred" and store.json("http:fred.stlouisfed.org").get("failures",0)>0:
-                # Retry smaller queries only after the same host cooldown permits it.
-                tables=[]
-                for series in ["VIXCLS","DGS10","DGS2","SP500"]:
-                    single="https://fred.stlouisfed.org/graph/fredgraph.csv?"+urlencode(
-                        {"id":series,"cosd":str(start.date()),"coed":str(cutoff.date())})
-                    tables.append(_fred(cached_body(store,client,"fred-"+series,single)))
-                table=tables[0]
-                for other in tables[1:]:
-                    table=table.merge(other,on="observation_date",how="outer",validate="one_to_one")
+            if name == "fred":
+                table=fred_daily(store,client,cutoff)
+                if store.json("fred_daily").get("error"):
+                    errors["fred"]=store.json("fred_daily")["error"]
             else:
-                body = cached_body(store, client, name, url)
-                table = _fred(body) if name == "fred" else None
+                body=cached_body(store,client,name,url)
             if name == "fred":
                 for col, label, unit in [("VIXCLS","vix","index"),("DGS10","ust10","percent"),("DGS2","ust2","percent"),("SP500","sp500","index")]:
                     append(label,table.observation_date,table[col],unit,"FRED",True)
