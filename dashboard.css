@@ -22,8 +22,6 @@ h1 { font-size:1.8rem !important; letter-spacing:-.7px; padding-top:0 !important
 h3 { font-size:1.05rem !important; font-weight:650 !important; letter-spacing:-.2px; color:var(--ink); }
 [data-testid="stHeaderActionElements"] a[href^="#"] { display:none; }
 .page-rule { height:3px; background:var(--accent); margin:4px 0 22px; border-radius:2px; }
-.snapshot { font-size:10px; color:var(--muted); letter-spacing:1px; padding:7px 0; }
-.snapshot strong { font-size:16px; color:var(--ink); letter-spacing:0; }
 [class*="st-key-card_"] { background:var(--surface); border-radius:12px; }
 [data-testid="stLayoutWrapper"]:has(>[class*="st-key-card_"]) { border-color:var(--line) !important; border-radius:12px !important; box-shadow:0 2px 5px #182b4304; }
 [class*="st-key-card_"] h3 { border-left:3px solid var(--accent); padding-left:10px; }

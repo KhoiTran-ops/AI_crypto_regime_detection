@@ -3,10 +3,8 @@ from pathlib import Path
 
 import streamlit as st
 
-from regime.dashboard_views import PAGES, read_json, summary
-from regime.live_view import live_view, runtime
-
-PAGES = {"Trực tiếp": (":material/sensors:", live_view), **PAGES}
+from regime.dashboard_data import read_json, runtime, summary
+from regime.dashboard_views import PAGES
 
 st.set_page_config(page_title="Crypto Regime · Nghiên cứu", page_icon="◈", layout="wide")
 st.markdown("<style>" + (Path(__file__).with_suffix(".css")).read_text(encoding="utf-8") + "</style>",
@@ -17,8 +15,8 @@ def navigate(page):
     st.session_state.page = page
 
 
-if "page" not in st.session_state:
-    st.session_state.page = "Trực tiếp"
+if st.session_state.get("page") not in PAGES:
+    st.session_state.page = "Tổng quan"
 
 with st.sidebar:
     for label, (icon, _) in PAGES.items():
@@ -52,9 +50,14 @@ with controls:
         if st.session_state.get("model") not in options:
             st.session_state.model = "HMM"
         model = right.selectbox("Mô hình", options, key="model")
-    else:
-        right.markdown('<div class="snapshot">SNAPSHOT<br><strong>30.09.2026</strong></div>', unsafe_allow_html=True)
 
 st.markdown('<div class="page-rule"></div>', unsafe_allow_html=True)
+
+
+@st.fragment(run_every="60s")
+def render_page(page, asset, model):
+    PAGES[page][1](asset, model)
+
+
 runtime()
-PAGES[page][1](asset, model)
+render_page(page, asset, model)

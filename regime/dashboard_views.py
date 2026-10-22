@@ -8,9 +8,24 @@ import plotly.graph_objects as go
 import streamlit as st
 from scipy.special import softmax
 
+from .dashboard_data import (
+    current_scores,
+    data_sources,
+    market_data,
+    model_record,
+    panel_data,
+    portfolio_data,
+    prediction,
+    read_table,
+    runtime,
+    summary,
+)
+from .dashboard_data import (
+    diagnostics as model_diagnostics,
+)
 from .data import ROOT, config
-from .labels import label_note, label_predictions, state_label
-from .results import Results, materialized_results
+from .labels import label_note, state_label
+from .results import Results
 
 COLORS = ["#0d9488", "#2563eb", "#d68a12", "#dc5266", "#8754c8", "#64748b"]
 STRATEGIES = {"buy_hold": "Buy-and-hold", "vol_target": "Volatility targeting", "regime_aware": "Regime-aware"}
@@ -19,38 +34,6 @@ SERIES = {"close": "Close price · USDT", "quote_volume": "Quote volume · USDT"
           "ust10": "10-year Treasury yield · %", "ust2": "2-year Treasury yield · %", "sp500": "S&P 500 · price index",
           "stablecoin_cap": "Stablecoin market cap · USD", "stablecoin_supply": "Stablecoin nominal supply · USD",
           "defi_tvl": "DeFi TVL · USD", "btc_market_cap": "BTC market cap · USD", "eth_market_cap": "ETH market cap · USD"}
-
-
-def version():
-    path = ROOT / "results/research.zip"
-    return path.stat().st_mtime_ns if path.exists() else 0
-
-
-@st.cache_data(show_spinner=False)
-def _frame(name, stamp):
-    return Results().frame(name)
-
-
-def read_table(name):
-    return _frame(name, version())
-
-
-@st.cache_data(show_spinner=False)
-def _json(name, stamp):
-    return Results().json(name)
-
-
-def read_json(name):
-    return _json(name, version())
-
-
-@st.cache_data(show_spinner=False)
-def _summary(name, stamp):
-    return Results().table(name)
-
-
-def summary(name):
-    return _summary(name, version())
 
 
 def chart(fig, height=340):
@@ -87,14 +70,6 @@ def table(frame, formats=None):
                  hide_index=True, width="stretch")
 
 
-def prediction(asset, model):
-    path = Results().model_path(asset, model)
-    base = path.removesuffix(".parquet")
-    record = read_json(base + (".json" if base.startswith("extensions/") else ".diagnostics.json"))
-    diagnostics = record["diagnostics"] if isinstance(record, dict) else record
-    return label_predictions(asset, model, read_table(path), diagnostics), base
-
-
 def probabilities(value):
     return [c for c in value if re.fullmatch(r"p_\d+", c)]
 
@@ -125,9 +100,11 @@ def signal_chart(value, model, asset):
 
 
 def overview(asset, model):
-    market = read_table(f"{asset}_market.parquet")
+    market = market_data(asset)
     value, _ = prediction(asset, model)
-    last, current = value.iloc[-1], market.loc[value.index[-1]]
+    last, current = value.iloc[-1], market.iloc[-1]
+    quotes = runtime().store.json("quotes")
+    price = quotes.get("prices", {}).get(asset)
     state = last.market_regime.split(" · ", 1)[0] if "market_regime" in value else "—"
     risk_label = "Highest-volatility cluster indicator" if model == "KMeans" else "P(highest-volatility state)"
     risk_value = f"{last.p_high_vol:.1%}" if "p_high_vol" in value else "—"
@@ -135,25 +112,35 @@ def overview(asset, model):
         risk_label, risk_value = "Membership strength", f"{last.membership_strength:.3f}"
     elif model == "BOCPD":
         risk_label, risk_value = "MAP run length · days", f"{int(last.map_run_length):,}"
-    grid_metrics([("Close price · USDT", f"{current.close:,.2f}"), ("Change-point probability" if model == "BOCPD" else "Market regime · " + model,
+    grid_metrics([("Last price · USDT" if price is not None else "Close price · USDT", f"{price if price is not None else current.close:,.2f}"),
+                  ("Change-point probability" if model == "BOCPD" else "Market regime · " + model,
                    f"{last.change_probability:.1%}" if model == "BOCPD" else state),
-                  ("30-day annualized volatility", f"{current.rv30:.1%}"),
-                  (risk_label, risk_value)])
+                  ("30-day annualized volatility", f"{current.rv30:.1%}"), (risk_label, risk_value)])
+    if quotes.get("fetched_at"):
+        stamp = pd.Timestamp(quotes["fetched_at"], unit="s", tz="UTC")
+        st.caption(f"Giá ghi nhận {stamp:%d.%m.%Y %H:%M:%S} UTC · mô hình đến {value.index[-1]:%d.%m.%Y} UTC")
     if "market_regime" in value:
-        st.caption("Trạng thái hiện tại: " + last.market_regime)
+        st.caption("Trạng thái: " + last.market_regime)
     main, side = st.columns([2.25, 1])
     with main, st.container(border=True, key="card_price"):
         st.subheader("Price and market regimes")
-        selected = st.date_input("Khoảng hiển thị", (value.index[0].date(), value.index[-1].date()),
-                                 min_value=value.index[0].date(), max_value=value.index[-1].date())
-        visible = value.loc[str(selected[0]):str(selected[-1])] if len(selected) == 2 else value
-        joined = visible.join(market[["close"]])
-        fig = go.Figure(go.Scatter(x=joined.index, y=joined.close, name="Close price", line=dict(color="#26364b", width=1.4)))
-        if "state" in joined:
+        selection_key, end_key = "display_range_" + asset, "display_end_" + asset
+        default = st.session_state.get(selection_key) or (market.index[0].date(), market.index[-1].date())
+        if len(default) == 2 and default[-1] == st.session_state.get(end_key):
+            default = (default[0], market.index[-1].date())
+        selected = st.date_input("Khoảng hiển thị", default, min_value=market.index[0].date(),
+                                 max_value=market.index[-1].date(), key=f"display_dates_{asset}_{market.index[-1].date()}")
+        st.session_state[selection_key] = selected
+        st.session_state[end_key] = market.index[-1].date()
+        window = slice(str(selected[0]), str(selected[-1])) if selected and len(selected) == 2 else slice(None)
+        prices = market.loc[window]
+        visible = value.loc[window]
+        fig = go.Figure(go.Scatter(x=prices.index, y=prices.close, name="Daily close", line=dict(color="#26364b", width=1.4)))
+        if "state" in visible:
+            joined = visible.join(prices[["close"]], how="inner")
             for name, points in joined.groupby("market_regime", sort=True):
                 state_id = int(points.state.iloc[0])
-                fig.add_trace(go.Scatter(x=points.index, y=points.close, mode="markers",
-                    name=name,
+                fig.add_trace(go.Scatter(x=points.index, y=points.close, mode="markers", name=name,
                     marker=dict(size=4, color=COLORS[state_id % len(COLORS)] if state_id >= 0 else COLORS[-1])))
         fig.update_yaxes(title_text="USDT")
         chart(fig, 405 if model == "HMM" else 365)
@@ -162,37 +149,42 @@ def overview(asset, model):
         st.subheader("Hồ sơ nghiên cứu")
         st.metric("Tài sản", asset.replace("USDT", " / USDT"))
         st.metric("Cấu hình mô hình / tài sản", int(summary("model_scores").asset.eq(asset).sum()))
-        st.metric("Quan sát đánh giá", f"{len(value):,} ngày")
+        st.metric("Quan sát mô hình", f"{len(value):,} ngày")
         st.caption(f"{value.index[0]:%d.%m.%Y} — {value.index[-1]:%d.%m.%Y}")
         st.caption("Đơn vị thời gian: ngày UTC")
     with st.container(border=True, key="card_signal"):
         st.subheader("Regime probabilities" if probabilities(value) else "Diễn biến tín hiệu")
-        signal_chart(visible, model, asset)
+        if len(visible):
+            signal_chart(visible, model, asset)
+        else:
+            st.info("Chưa có kết quả mô hình trong khoảng ngày đã chọn.")
     left, right = st.columns(2)
     for column, title, field in ((left, "BTC / ETH · normalized prices", "close"),
                                   (right, "BTC / ETH · 30-day correlation", "correlation")):
         with column, st.container(border=True, key="card_compare_" + field):
             st.subheader(title)
-            frames = {a: read_table(f"{a}_market.parquet") for a in ("BTCUSDT", "ETHUSDT")}
+            frames = {a: market_data(a) for a in ("BTCUSDT", "ETHUSDT")}
             if field == "close":
                 fig = go.Figure()
-                for a, f in frames.items():
-                    prices = f.loc[value.index, "close"]
-                    fig.add_trace(go.Scatter(x=prices.index, y=100*prices/prices.iloc[0], name=a[:3]))
+                for a, frame in frames.items():
+                    prices = frame.loc[window, "close"]
+                    if len(prices):
+                        fig.add_trace(go.Scatter(x=prices.index, y=100*prices/prices.iloc[0], name=a[:3]))
             else:
-                corr = frames["BTCUSDT"]["return"].rolling(30).corr(frames["ETHUSDT"]["return"]).loc[value.index]
+                corr = frames["BTCUSDT"]["return"].rolling(30).corr(frames["ETHUSDT"]["return"]).loc[window]
                 fig = go.Figure(go.Scatter(x=corr.index, y=corr, name="Correlation", line_color=COLORS[0]))
                 fig.update_yaxes(range=[-1, 1])
             chart(fig, 250)
 
 
 def models(asset, model):
-    scores = summary("model_scores").query("asset == @asset").copy()
+    scores = current_scores(asset)
     value, _ = prediction(asset, model)
     selected = scores.loc[scores.model.eq(model)].iloc[0]
     grid_metrics([("Cấu hình", str(len(scores))), ("Quan sát", str(len(value))),
                   ("Log score · return", f"{selected.mean_return_log_score:.4f}" if pd.notna(selected.mean_return_log_score) else "—"),
                   ("Non-converged refits", str(int(selected.nonconverged_refits)))])
+    st.caption(f"{value.index[0]:%d.%m.%Y} — {value.index[-1]:%d.%m.%Y} UTC")
     with st.container(border=True, key="card_model_scores"):
         st.subheader("Đánh giá mô hình")
         target = st.selectbox("Chỉ tiêu", ["Return density", "Joint density · core features", "Clustering"])
@@ -206,6 +198,10 @@ def models(asset, model):
             if target != "Return density":
                 comparable = comparable.loc[comparable.score_group.eq("joint_core")]
             comparable = comparable.sort_values(metric)
+            prefix = "return_score_" if target == "Return density" else "joint_score_"
+            scope = comparable.iloc[0]
+            st.caption(f"Common observations: {int(scope[prefix + 'days']):,} · "
+                       f"{scope[prefix + 'start']} — {scope[prefix + 'end']} UTC")
             fig = px.bar(comparable, x=metric, y="model", orientation="h", color="model",
                          color_discrete_sequence=COLORS, text=metric,
                          labels={metric: "Mean log density", "model": ""})
@@ -214,7 +210,7 @@ def models(asset, model):
             chart(fig, max(270, len(comparable)*28+65))
         st.caption("Log score càng cao càng tốt. Core joint density dùng log return, realized volatility và relative volume.")
     with st.container(border=True, key="card_score_comparisons"):
-        st.subheader("Score differences and 95% confidence intervals")
+        st.subheader("Score differences and 95% confidence intervals · " + config()["test_end"])
         comparison = summary("score_comparisons").query("asset == @asset").copy()
         comparison["left"] = comparison.left.fillna(comparison.model)
         comparison["right"] = comparison.right.fillna(comparison.reference)
@@ -235,42 +231,42 @@ def models(asset, model):
 
 
 def portfolio(asset, model):
-    performance = summary("portfolio_performance").query("asset == @asset and model == @model")
+    performance, paths = portfolio_data(asset, model)
     cost = st.segmented_control("Transaction costs · bps", [5, 10, 25], default=10)
     cost = 10 if cost is None else cost
     view = performance.loc[performance.cost_bps.eq(cost)].copy()
     active = view.loc[view.strategy.eq("regime_aware")].iloc[0]
     grid_metrics([("CAGR · regime-aware", f"{active.cagr:.1%}"), ("Sharpe", f"{active.sharpe:.2f}"),
                   ("Maximum drawdown", f"{active.max_drawdown:.1%}"), ("Average exposure", f"{active.average_exposure:.1%}")])
-    _, base = prediction(asset, model)
-    equity, drawdown = go.Figure(), go.Figure()
-    for strategy, label in STRATEGIES.items():
-        path = read_table(base + f"_{strategy}_portfolio.parquet")
-        equity.add_trace(go.Scatter(x=path.index, y=path.equity, name=label))
-        drawdown.add_trace(go.Scatter(x=path.index, y=path.drawdown, name=label))
-    for title, fig in (("Portfolio value · 10 bps", equity), ("Drawdown · 10 bps", drawdown)):
-        with st.container(border=True, key="card_portfolio_" + title):
-            st.subheader(title)
-            if fig is drawdown:
+    dates = paths[cost, "regime_aware"].index
+    st.caption(f"{dates[0]:%d.%m.%Y} — {dates[-1]:%d.%m.%Y} UTC")
+    for title, field, height in (("Portfolio value", "equity", 310), ("Drawdown", "drawdown", 245)):
+        fig = go.Figure()
+        for strategy, label in STRATEGIES.items():
+            path = paths[cost, strategy]
+            fig.add_trace(go.Scatter(x=path.index, y=path[field], name=label))
+        with st.container(border=True, key="card_portfolio_" + field):
+            st.subheader(f"{title} · {cost} bps")
+            if field == "drawdown":
                 fig.update_yaxes(tickformat=".0%")
-            chart(fig, 310 if fig is equity else 245)
+            chart(fig, height)
     with st.container(border=True, key="card_portfolio_table"):
         st.subheader(f"Hiệu quả và rủi ro · {cost} bps")
         view["strategy"] = view.strategy.map(STRATEGIES)
         table(view[["strategy", "cagr", "volatility", "sharpe", "sortino", "max_drawdown", "turnover", "ending_value"]],
               {"cagr": "{:.2%}", "volatility": "{:.2%}", "sharpe": "{:.3f}", "sortino": "{:.3f}",
                "max_drawdown": "{:.2%}", "turnover": "{:.2f}", "ending_value": "{:.3f}"})
+        st.download_button("Tải hiệu quả danh mục", performance.to_csv(index=False), file_name=f"{asset}_{model}_portfolio.csv")
+    with st.expander("Sharpe difference · 95% CI · " + config()["test_end"]):
         intervals = summary("portfolio_uncertainty").query("asset == @asset and model == @model")
         table(intervals[["sharpe_difference_ci_low", "sharpe_difference_ci_high", "block_days", "bootstrap_repetitions"]])
-        st.download_button("Tải hiệu quả danh mục", performance.to_csv(index=False), file_name=f"{asset}_{model}_portfolio.csv")
 
 
 def states(asset, model):
     value, base = prediction(asset, model)
     store = Results()
-    path = base + (".json" if base.startswith("extensions/") else ".diagnostics.json")
-    record = read_json(path)
-    diagnostics = record["diagnostics"] if isinstance(record, dict) else record
+    _, record = model_record(asset, model)
+    diagnostics = model_diagnostics(asset, model)
     with st.container(border=True, key="card_state_signal"):
         st.subheader("Probabilities and signals · " + model)
         signal_chart(value, model, asset)
@@ -284,6 +280,7 @@ def states(asset, model):
             labels = [f"S{i+1} raw" for i in range(len(matrix))]
         with left, st.container(border=True, key="card_transition"):
             st.subheader("Transition matrix")
+            st.caption(str(latest.get("period", latest.get("period_start")))[:10])
             names = [state_label(asset, model, i, k=len(matrix),
                      high_state=latest.get("high_unconditional_variance_state")) for i in range(len(matrix))]
             fig = px.imshow(matrix, x=labels, y=labels, text_auto=".2f", zmin=0, zmax=1,
@@ -293,7 +290,7 @@ def states(asset, model):
                               hovertemplate="%{customdata}<br>P=%{z:.3f}<extra></extra>")
             chart(fig, 325)
     with right if transitions else st.container(), st.container(border=True, key="card_regime_profile"):
-        st.subheader("Regime profiles")
+        st.subheader("Regime profiles · 31.12.2024" if model == "HMM" else "Regime profiles")
         if model == "HMM":
             profiles = summary("regime_profiles").query("asset == @asset").drop(columns="asset").copy()
             profiles.insert(1, "Market regime", profiles.regime.map(
@@ -314,6 +311,7 @@ def states(asset, model):
         with st.container(border=True, key="card_coefficients"):
             st.subheader("Model coefficients")
             coefficients = read_table(coefficient_path)
+            st.caption("Đến " + str(coefficients.period.max())[:10])
             if isinstance(record, dict):
                 covariates = ["Intercept", *(record["decision"].get("covariates") or [])]
                 coefficients["covariate"] = [covariates[int(p.split(".tvtp")[1])] if ".tvtp" in p else p
@@ -340,12 +338,12 @@ def states(asset, model):
 
 
 def data(asset, model):
-    market = read_table(f"{asset}_market.parquet")
-    sources = summary("data_sources")
+    market = market_data(asset)
+    sources = data_sources()
     report = ROOT / "results/tom_tat_ket_qua.html"
     if report.exists():
         st.download_button("Tải bản tổng hợp kết quả", report.read_bytes(), file_name=report.name, mime="text/html")
-    grid_metrics([("Bắt đầu dữ liệu spot", "17.08.2017"), ("Chốt dữ liệu", "30.09.2026"),
+    grid_metrics([("Bắt đầu dữ liệu spot", "17.08.2017"), ("Ngày dữ liệu mới nhất", f"{market.index[-1]:%d.%m.%Y}"),
                   ("Tài sản", "BTC / ETH"), ("Chuỗi vĩ mô / on-chain", str(sources.series.notna().sum()))])
     with st.container(border=True, key="card_data_explorer"):
         st.subheader("Khám phá dữ liệu")
@@ -353,16 +351,11 @@ def data(asset, model):
         if series in market:
             chart(px.line(market, x=market.index, y=series, labels={series: SERIES[series], "date": "Ngày UTC"}), 360)
         else:
-            panel_path = ROOT / "results/extensions/external_panel.parquet"
-            if panel_path.exists():
-                panel = pd.read_parquet(panel_path)
+            panel = panel_data(asset)
+            if series in panel and panel[series].notna().any():
                 chart(px.line(panel, x=panel.index, y=series, labels={series: SERIES[series], "date": "Ngày khả dụng · UTC"}), 360)
-            elif st.button("Tải chuỗi dữ liệu", icon=":material/download:"):
-                from .external import build_external
-                from .supply import add_supply
-                with st.spinner("Đang tải và chuẩn hóa dữ liệu…"), materialized_results():
-                    add_supply(build_external())
-                st.rerun()
+            else:
+                st.info("Đang chờ dữ liệu từ nguồn.")
     with st.container(border=True, key="card_data_sources"):
         st.subheader("Nguồn và độ phủ dữ liệu")
         source_view = sources.copy()
@@ -372,6 +365,19 @@ def data(asset, model):
         for col in ("first_date", "last_date"):
             source_view[col] = pd.to_datetime(source_view[col], utc=True, format="mixed").dt.strftime("%d.%m.%Y")
         table(source_view[["Chỉ số", "asset", "Nguồn", "first_date", "last_date", "Số quan sát"]])
+    with st.expander("Trạng thái cập nhật"):
+        cache = runtime().store
+        rows = []
+        for name in summary("model_scores").query("asset == @asset").model:
+            record = cache.json(f"model:{asset}:{name}")
+            rows.append({"Mô hình": name, "Ngày kết quả UTC": record.get("through", config()["test_end"]),
+                         "Trạng thái": "Đang chạy" if record.get("running") else record.get("error") or "Sẵn sàng"})
+        table(pd.DataFrame(rows))
+        for source, error in cache.json("external_status").get("errors", {}).items():
+            st.write(source + ": " + error)
+        fred = cache.json("fred_daily")
+        if fred.get("day"):
+            st.caption("FRED · một đợt mỗi ngày UTC · ngày đã thử: " + fred["day"])
     with st.container(border=True, key="card_sample_counts"):
         st.subheader("Cỡ mẫu theo nhóm biến")
         counts = summary("sample_counts").query("asset == @asset")
