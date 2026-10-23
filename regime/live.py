@@ -137,7 +137,11 @@ class Client:
                     break
             time.sleep(min(wait, 2))
         try:
-            request = Request(url, headers={"User-Agent": "CryptoRegimeDashboard/0.2", "Accept": "application/json,text/csv,*/*"})
+            headers = {"User-Agent": "CryptoRegimeDashboard/0.2"}
+            # FRED's graph export stalls with the generic JSON/CSV Accept header.
+            if parsed.hostname != "fred.stlouisfed.org":
+                headers["Accept"] = "application/json,text/csv,*/*"
+            request = Request(url, headers=headers)
             with self.opener(request, timeout=45 if parsed.hostname == "fred.stlouisfed.org" else 20) as response:
                 if urlsplit(response.geturl()).hostname not in HOSTS:
                     raise ValueError("Unexpected provider redirect")

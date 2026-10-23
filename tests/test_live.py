@@ -165,7 +165,15 @@ def test_fred_attempts_one_batch_per_utc_day_across_restarts(tmp_path, fail):
             if fail:
                 raise TimeoutError("timed out")
             series=parse_qs(urlsplit(url).query)["id"][0]
-            return f"observation_date,{series}\n2026-10-20,20.5\n".encode()
+            assert series == "VIXCLS,DGS10,DGS2,SP500"
+            # Grouped ZIP exports can include history outside the requested window.
+            body=("observation_date,"+series+"\n1962-01-02,1,2,3,4\n"
+                  "2026-10-20,20.5,4.2,3.8,6000\n2026-10-25,1,2,3,4\n").encode()
+            output=io.BytesIO()
+            import zipfile
+            with zipfile.ZipFile(output,"w") as archive:
+                archive.writestr("observations.csv",body)
+            return output.getvalue()
     for _ in range(2):
         store=Store(tmp_path / "live.sqlite")
         if fail:
@@ -174,24 +182,40 @@ def test_fred_attempts_one_batch_per_utc_day_across_restarts(tmp_path, fail):
         else:
             assert set(fred_daily(store,Provider(),pd.Timestamp("2026-10-21",tz="UTC")).columns)=={
                 "observation_date","VIXCLS","DGS10","DGS2","SP500"}
-    assert len(calls)==(1 if fail else 4)
+    assert len(calls)==1
     if fail:
         with pytest.raises(RuntimeError):
             fred_daily(store,Provider(),pd.Timestamp("2026-10-22",tz="UTC"))
     else:
         fred_daily(store,Provider(),pd.Timestamp("2026-10-22",tz="UTC"))
-    assert len(calls)==(2 if fail else 8)
+    assert len(calls)==2
     # An older cutoff must not reopen a previously attempted day.
     if fail:
         with pytest.raises(RuntimeError):
             fred_daily(store,Provider(),pd.Timestamp("2026-10-21",tz="UTC"))
     else:
         fred_daily(store,Provider(),pd.Timestamp("2026-10-21",tz="UTC"))
-    assert len(calls)==(2 if fail else 8)
+    assert len(calls)==2
     if not fail:
         fail=True
         prior=fred_daily(store,Provider(),pd.Timestamp("2026-10-23",tz="UTC"))
+        assert prior.observation_date.tolist()==["2026-10-20"]
         assert "VIXCLS" in prior and store.json("fred_daily")["error"]=="timed out"
         assert store.json("fred_daily")["last_success_cutoff"]=="2026-10-22"
         fred_daily(Store(tmp_path / "live.sqlite"),Provider(),pd.Timestamp("2026-10-23",tz="UTC"))
-        assert len(calls)==9
+        assert len(calls)==3
+
+
+def test_fred_download_omits_incompatible_accept_header(tmp_path):
+    from regime.live import Client, Store
+
+    class Response(io.BytesIO):
+        headers = {}
+        def geturl(self):
+            return "https://fred.stlouisfed.org/graph/fredgraph.csv"
+    def opener(request, **kwargs):
+        assert request.get_header("Accept") is None
+        assert kwargs["timeout"] == 45
+        return Response(b"observation_date,VIXCLS\n2026-10-20,17.31\n")
+    client=Client(Store(tmp_path / "live.sqlite"),opener=opener)
+    assert client.get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=VIXCLS").startswith(b"observation_date")

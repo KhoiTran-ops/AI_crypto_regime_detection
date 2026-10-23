@@ -112,27 +112,28 @@ def fred_daily(store, client, cutoff):
     if claimed:
         try:
             start=pd.Timestamp(config()["end"],tz="UTC")-60*DAY
-            tables=[]
-            for series in ["VIXCLS","DGS10","DGS2","SP500"]:
-                url="https://fred.stlouisfed.org/graph/fredgraph.csv?"+urlencode(
-                    {"id":series,"cosd":str(start.date()),"coed":str(cutoff.date())})
-                body=client.get(url)
-                table=_fred(body)[["observation_date",series]]
-                dates=pd.to_datetime(table.observation_date,utc=True,errors="raise")
-                values=pd.to_numeric(table[series],errors="raise")
-                if table.empty or dates.duplicated().any() or not dates.between(start,cutoff).all():
-                    raise ValueError("Invalid FRED date range: "+series)
-                if not np.isfinite(values.dropna()).all():
-                    raise ValueError("Invalid FRED values: "+series)
-                tables.append(table.assign(**{series:values}))
-                store.blob("raw:fred-"+series,body)
-                store.json("source:fred-"+series,{"fetched_at":time.time(),"url":url,
-                                                "sha256":hashlib.sha256(body).hexdigest()})
-            table=tables[0]
-            for other in tables[1:]:
-                table=table.merge(other,on="observation_date",how="outer",validate="one_to_one")
+            series=["VIXCLS","DGS10","DGS2","SP500"]
+            url="https://fred.stlouisfed.org/graph/fredgraph.csv?"+urlencode(
+                {"id":",".join(series),"cosd":str(start.date()),"coed":str(cutoff.date())},safe=",")
+            raw=client.get(url)
+            table=_fred(raw)[["observation_date",*series]]
+            dates=pd.to_datetime(table.observation_date,utc=True,errors="raise")
+            if dates.isna().any() or dates.duplicated().any():
+                raise ValueError("Invalid FRED observation dates")
+            # Multi-series ZIP exports may return full history; enforce our window locally.
+            table=table.loc[dates.between(start,cutoff)].sort_values("observation_date").copy()
+            for name in series:
+                values=pd.to_numeric(table[name],errors="raise")
+                if values.notna().sum()==0 or not np.isfinite(values.dropna()).all():
+                    raise ValueError("Invalid FRED values: "+name)
+                table[name]=values
+            store.blob("raw:fred-batch",raw)
+            for name in series:
+                store.json("source:fred-"+name,{"fetched_at":time.time(),"url":url,
+                    "sha256":hashlib.sha256(raw).hexdigest(),
+                    "observation_through":str(table.loc[table[name].notna(),"observation_date"].max())})
             body=table.to_csv(index=False).encode()
-            record.update(error="",last_success_at=time.time(),last_success_cutoff=str(cutoff.date()),
+            record.update(error="",finished_at=time.time(),last_success_at=time.time(),last_success_cutoff=str(cutoff.date()),
                           sha256=hashlib.sha256(body).hexdigest())
             with store.connection() as db:
                 db.executemany("INSERT OR REPLACE INTO cache VALUES (?,?)",
