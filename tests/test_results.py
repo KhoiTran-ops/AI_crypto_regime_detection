@@ -158,3 +158,25 @@ def test_dashboard_model_comparisons_use_common_observation_dates(tmp_path, monk
     assert scores.loc["HMM","joint_score_end"]=="2026-10-01"
     original=archive.table("model_scores").query('asset == "BTCUSDT" and model == "HMM"').iloc[0]
     assert scores.loc["HMM","mean_return_log_score"]==pytest.approx(original.mean_return_log_score)
+
+
+def test_dashboard_shows_background_fetch_errors(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    from streamlit.testing.v1 import AppTest
+
+    from regime import dashboard_data, dashboard_views
+    from regime.live import Store
+
+    store=Store(tmp_path / "live.sqlite")
+    for role in ("quotes", "daily"):
+        store.json("worker:"+role,{"error":"HTTP 451"})
+    service=SimpleNamespace(store=store,threads=[object()])
+    monkeypatch.setattr(dashboard_data,"runtime",lambda:service)
+    monkeypatch.setattr(dashboard_views,"runtime",lambda:service)
+    app=AppTest.from_string("from regime.dashboard_views import data\ndata('BTCUSDT',None)").run(timeout=60)
+    assert not app.exception
+    assert [error.value for error in app.error]==[
+        "Cập nhật giá: HTTP 451", "Cập nhật dữ liệu ngày: HTTP 451"]
+    statuses=next(frame.value for frame in app.dataframe if "Trạng thái" in frame.value)
+    assert statuses["Trạng thái"].eq("Chưa có cập nhật mới").all()

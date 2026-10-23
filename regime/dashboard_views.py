@@ -370,12 +370,23 @@ def data(asset, model):
             source_view[col] = pd.to_datetime(source_view[col], utc=True, format="mixed").dt.strftime("%d.%m.%Y")
         table(source_view[["Chỉ số", "asset", "Nguồn", "first_date", "last_date", "Số quan sát"]])
     with st.expander("Trạng thái cập nhật"):
-        cache = runtime().store
+        service = runtime()
+        cache = service.store
+        if not service.threads:
+            st.info("Cập nhật tự động đang tắt.")
+        for role, label in (("quotes", "Cập nhật giá"), ("daily", "Cập nhật dữ liệu ngày")):
+            worker = cache.json("worker:" + role)
+            if worker.get("error"):
+                st.error(label + ": " + worker["error"])
+            if worker.get("updated_at"):
+                stamp = pd.Timestamp(worker["updated_at"], unit="s", tz="UTC")
+                st.caption(f"{label} · lượt gần nhất {stamp:%d.%m.%Y %H:%M:%S} UTC")
         rows = []
         for name in summary("model_scores").query("asset == @asset").model:
             record = cache.json(f"model:{asset}:{name}")
             rows.append({"Mô hình": name, "Ngày kết quả UTC": record.get("through", config()["test_end"]),
-                         "Trạng thái": "Đang chạy" if record.get("running") else record.get("error") or "Sẵn sàng"})
+                         "Trạng thái": "Đang chạy" if record.get("running") else record.get("error") or (
+                             "Đã cập nhật" if record.get("through") else "Chưa có cập nhật mới")})
         table(pd.DataFrame(rows))
         for source, error in cache.json("external_status").get("errors", {}).items():
             st.write(source + ": " + error)
