@@ -27,7 +27,7 @@ HEADERS = {"asset": "Tài sản", "model": "Mô hình", "regime": "Mã", "cohort
            "volatility": "Annualized volatility", "max_drawdown": "Maximum drawdown", "average_exposure": "Average exposure",
            "cost_bps": "Phí (bps)", "mean_difference": "Chênh lệch", "ci_low": "95% CI lower",
            "ci_high": "95% CI upper", "n_common": "Ngày chung", "validation_log_score": "Validation log score",
-           "train_bic": "Training BIC", "n_parameters": "Parameter count", "state_changes": "State changes"}
+           "train_bic": "Training BIC", "train_aic": "Training AIC", "n_parameters": "Parameter count", "state_changes": "State changes"}
 SOURCES = (
     ("Hyndman & Athanasopoulos · rolling forecasting origin", "https://otexts.com/fpp3/toolbox.html#time-series-cross-validation"),
     ("Cawley & Talbot (2010) · selection bias", "https://jmlr.org/papers/v11/cawley10a.html"),
@@ -128,7 +128,7 @@ def build_report():
     selection = store.frame("model_selection.csv")
     simulation = store.frame("simulation_summary.csv")
     simulation = simulation.loc[simulation.heavy_tail.eq(False)].copy()
-    add("Lựa chọn HMM", table(selection[["asset", "k", "validation_log_score", "train_bic", "n_parameters"]])
+    add("Lựa chọn HMM", table(selection[["asset", "k", "validation_log_score", "train_bic", "train_aic", "n_parameters"]])
         + table(simulation[["asset", "k", "n_days", "transition_rmse", "transition_rmse_mcse", "volatility_relative_rmse", "convergence_rate"]])
         + "<p>BTC K=5 có validation log score cao hơn K=4 nhưng không qua recovery hiện hành. RMSE trong bảng là trung bình RMSE "
           "của từng mô phỏng, không phải RMSE gộp. MCSE BTC K=4 ≈0,0102 cho thấy quyết định gần ngưỡng còn bất định; giữ nguyên theo yêu cầu.</p>")
