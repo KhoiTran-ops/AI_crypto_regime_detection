@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 
-@pytest.mark.parametrize("code,retry,until", [(429,"7200",8200),(418,"7200",8200),(418,None,260200)])
+@pytest.mark.parametrize("code,retry,until", [(429,"7200",8200),(418,"7200",8200),(418,None,260200),(451,None,87400)])
 def test_rate_limit_survives_restart_and_honors_full_retry_after(tmp_path, code, retry, until):
     from regime.live import Client, Deferred, Store
 
@@ -16,12 +16,12 @@ def test_rate_limit_survives_restart_and_honors_full_retry_after(tmp_path, code,
         raise HTTPError(args[0].full_url, code, "limited", {"Retry-After": retry} if retry else None, io.BytesIO())
     client = Client(Store(tmp_path / "live.sqlite"), opener=limited, clock=lambda: 1000.)
     with pytest.raises(Deferred):
-        client.get("https://api.binance.com/api/v3/time")
+        client.get("https://data-api.binance.vision/api/v3/time")
     restarted = Client(Store(tmp_path / "live.sqlite"), opener=limited, clock=lambda: 1061.)
     with pytest.raises(Deferred):
-        restarted.get("https://api.binance.com/api/v3/time")
+        restarted.get("https://data-api.binance.vision/api/v3/time")
     assert len(calls) == 1
-    assert restarted.store.json("http:api.binance.com")["until"] >= until
+    assert restarted.store.json("http:data-api.binance.vision")["until"] >= until
 
 
 def test_only_complete_utc_bars_and_contiguous_append():
@@ -66,6 +66,7 @@ def test_quote_poll_is_shared_and_uses_valid_compact_symbols(tmp_path):
     calls=[]
     class Provider:
         def json(self, url):
+            assert urlsplit(url).hostname == "data-api.binance.vision"
             symbols=parse_qs(urlsplit(url).query)["symbols"][0]
             assert " " not in symbols
             calls.append(url)
@@ -135,6 +136,7 @@ def test_daily_cutoff_uses_exchange_utc_clock(tmp_path, monkeypatch, stamp, expe
     observed=[]
     class Provider:
         def json(self, url):
+            assert url == "https://data-api.binance.vision/api/v3/time"
             return {"serverTime":int(pd.Timestamp(stamp).timestamp()*1000)}
     def spot(store,client,cutoff):
         observed.append(str(cutoff.date()))

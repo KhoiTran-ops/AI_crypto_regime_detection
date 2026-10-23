@@ -14,6 +14,7 @@ from .data import config, normalize_spot
 from .extensions import GROUPS
 from .external import _fred, asof_panel, feature_observations, validate_observations
 from .features import build_features
+from .live import SPOT_API
 from .results import Results
 from .supply import COVARIATES
 
@@ -57,7 +58,7 @@ def merge_days(old, addition):
 def update_spot(store, client, cutoff):
     cfg = config()
     if time.time()-store.json("exchange").get("fetched_at", 0) >= 86400:
-        info = client.json("https://api.binance.com/api/v3/exchangeInfo?"+urlencode({"symbols": json.dumps(cfg["assets"],separators=(",", ":"))}))
+        info = client.json(SPOT_API + "/api/v3/exchangeInfo?"+urlencode({"symbols": json.dumps(cfg["assets"],separators=(",", ":"))}))
         minute = next(r["limit"] for r in info["rateLimits"] if r["rateLimitType"] == "REQUEST_WEIGHT"
                       and r["interval"] == "MINUTE" and r["intervalNum"] == 1)
         store.json("exchange", {"minute_weight": minute, "fetched_at": time.time()})
@@ -70,7 +71,7 @@ def update_spot(store, client, cutoff):
             end = min(cutoff, start+999*DAY)
             params = {"symbol": asset, "interval": "1d", "startTime": int(start.timestamp()*1000),
                       "endTime": int((end+DAY).timestamp()*1000)-1, "limit": 1000}
-            rows = client.json("https://api.binance.com/api/v3/klines?"+urlencode(params))
+            rows = client.json(SPOT_API + "/api/v3/klines?"+urlencode(params))
             extra = closed_bars(rows, asset, cutoff+DAY)
             if extra.empty or extra.index[0] != start or extra.index[-1] != end:
                 raise ValueError(f"Incomplete spot coverage: {asset}, {start.date()}–{end.date()}")

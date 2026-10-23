@@ -48,7 +48,7 @@ Dashboard có thể chạy ngay sau cài đặt bằng các file có sẵn trong
 
 ## Cập nhật trực tiếp
 
-Dashboard tự khởi động worker dùng chung: giá mỗi 60 giây; mô hình cập nhật sau khi ngày UTC hoàn tất. FRED chỉ tải một đợt mỗi ngày UTC (từ khoảng 07:05 giờ Việt Nam); nếu lỗi, chờ ngày kế tiếp, không tự thử lặp trong ngày. Giữ server chạy để duy trì cập nhật. Dữ liệu/cache live nằm trong `data/live/`, không cần commit. Năm tab hiện có tự cập nhật và giữ đầy đủ lịch sử; gói kết quả đã chốt được bảo toàn.
+Dashboard tự khởi động worker dùng chung: giá mỗi 60 giây; mô hình cập nhật sau khi ngày UTC hoàn tất. FRED chỉ tải một đợt mỗi ngày UTC (từ khoảng 07:05 giờ Việt Nam); nếu lỗi, chờ ngày kế tiếp, không tự thử lặp trong ngày. Giữ server chạy để duy trì cập nhật. Dữ liệu spot cập nhật qua endpoint public-market chính thức `data-api.binance.vision`; không cần API key. Dữ liệu/cache live nằm trong `data/live/`, không cần commit. Năm tab hiện có tự cập nhật và giữ đầy đủ lịch sử; gói kết quả đã chốt được bảo toàn.
 
 Chạy worker độc lập (không cần mở trình duyệt):
 

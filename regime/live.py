@@ -19,7 +19,9 @@ from .data import ROOT, config
 
 LOG = logging.getLogger(__name__)
 DIRECTORY = ROOT / "data/live"
-HOSTS = {"api.binance.com", "fapi.binance.com", "data.binance.vision", "fred.stlouisfed.org",
+SPOT_HOST = "data-api.binance.vision"
+SPOT_API = "https://" + SPOT_HOST
+HOSTS = {SPOT_HOST, "fapi.binance.com", "data.binance.vision", "fred.stlouisfed.org",
          "query1.finance.yahoo.com", "community-api.coinmetrics.io", "stablecoins.llama.fi", "api.llama.fi"}
 
 
@@ -150,7 +152,7 @@ class Client:
                     raise ValueError("Live response exceeds 50 MB")
                 weight = int(response.headers.get("X-MBX-USED-WEIGHT-1M", 0))
             state.update(failures=0, error="", used_weight=weight)
-            if parsed.hostname == "api.binance.com":
+            if parsed.hostname == SPOT_HOST:
                 limit = self.store.json("exchange").get("minute_weight", 6000)
                 if weight >= limit - 20:
                     state["until"] = (int(self.clock() // 60) + 1) * 60 + 1
@@ -191,7 +193,7 @@ def update_quotes(store, client):
         return previous
     from urllib.parse import urlencode
     assets = config()["assets"]
-    values = client.json("https://api.binance.com/api/v3/ticker/price?" + urlencode({"symbols": json.dumps(assets,separators=(",", ":"))}))
+    values = client.json(SPOT_API + "/api/v3/ticker/price?" + urlencode({"symbols": json.dumps(assets,separators=(",", ":"))}))
     prices = {row["symbol"]: float(row["price"]) for row in values}
     if set(prices) != set(assets) or any(not 0 < p < float("inf") for p in prices.values()):
         raise ValueError("Invalid live ticker response")
@@ -202,7 +204,7 @@ def daily_update(store, client):
     from .live_data import update_controls, update_spot
     from .live_models import update_models
 
-    clock = client.json("https://api.binance.com/api/v3/time")
+    clock = client.json(SPOT_API + "/api/v3/time")
     now = pd.Timestamp(clock["serverTime"], unit="ms", tz="UTC")
     # Allow five minutes after UTC rollover; the current bar is always excluded separately.
     cutoff = now.floor("D") - pd.Timedelta(days=1 if now.minute >= 5 or now.hour else 2)
